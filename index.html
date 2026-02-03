@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UNRESTRICTED</title>
+    <style>
+        :root { --accent: #00ff88; --bg: #050505; --card: rgba(25, 25, 25, 0.8); --text: #ffffff; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
+        
+        .header { text-align: center; margin: 40px 0 20px; }
+        h1 { font-size: 1.8rem; letter-spacing: 6px; margin: 0; font-weight: 900; color: #fff; text-shadow: 0 0 20px rgba(0,255,136,0.3); }
+        .tagline { color: var(--accent); font-size: 0.75rem; margin-top: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+
+        .tabs { display: flex; width: 100%; max-width: 400px; background: #111; border-radius: 15px; padding: 4px; margin-bottom: 20px; border: 1px solid #222; }
+        .tab { flex: 1; padding: 12px; text-align: center; font-size: 0.75rem; font-weight: 800; border-radius: 12px; cursor: pointer; color: #555; transition: 0.3s; letter-spacing: 1px; }
+        .tab.active { background: var(--accent); color: #000; box-shadow: 0 0 15px rgba(0,255,136,0.4); }
+
+        .search-container { width: 100%; max-width: 400px; margin-bottom: 20px; }
+        input { width: 100%; padding: 20px; border-radius: 18px; border: 1px solid #222; background: #111; color: white; font-size: 16px; outline: none; box-sizing: border-box; transition: 0.3s; }
+        input:focus { border-color: var(--accent); }
+
+        .result-card { background: var(--card); backdrop-filter: blur(10px); width: 100%; max-width: 400px; border-radius: 30px; padding: 30px; border: 1px solid rgba(255,255,255,0.1); margin-top: 10px; display: none; box-sizing: border-box; animation: slideIn 0.4s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        .score-box { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .score-circle { width: 70px; height: 70px; border: 3px solid var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 900; color: var(--accent); }
+        
+        .btn-save { background: #fff; color: #000; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: 800; cursor: pointer; margin-top: 20px; text-transform: uppercase; font-size: 0.8rem; }
+
+        .vault-section { width: 100%; max-width: 400px; margin-top: 40px; }
+        .vault-title { font-size: 0.7rem; font-weight: 800; color: #444; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; border-bottom: 1px solid #222; padding-bottom: 10px; }
+        .vault-item { background: #111; padding: 18px; border-radius: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; position: relative; }
+        .vault-item .delete { color: #ff4444; font-size: 1.2rem; margin-left: 15px; cursor: pointer; padding: 5px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>UNRESTRICTED</h1>
+        <div class="tagline">Love every bite. Build the body you love.</div>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" id="tab-home" onclick="setTab('atHome')">AT HOME</div>
+        <div class="tab" id="tab-go" onclick="setTab('onGo')">ON THE GO</div>
+    </div>
+
+    <div class="search-container">
+        <input type="text" id="find" placeholder="Search a food item..." autocomplete="off">
+    </div>
+
+    <div id="card" class="result-card">
+        <div class="score-box">
+            <h2 id="sName" style="text-transform:capitalize; margin:0; font-size: 1.5rem;">Food</h2>
+            <div class="score-circle" id="sNum">0</div>
+        </div>
+        <p id="sDesc" style="color:#aaa; font-size:0.9rem; line-height:1.4;"></p>
+        <button class="btn-save" onclick="saveToVault()">+ Add to Vault</button>
+    </div>
+
+    <div class="vault-section">
+        <div class="vault-title" id="vaultHeader">VAULT: AT HOME</div>
+        <div id="vaultList"></div>
+    </div>
+
+    <script>
+        let currentTab = 'atHome';
+        const foodData = {
+            "banana": { s: 8, d: "Steady energy, high fiber. Perfect natural snack." },
+            "steak": { s: 10, d: "Maximum satiety. Shuts down hunger for hours." },
+            "pizza": { s: 3, d: "High reward, low fullness. A delight, not fuel." },
+            "egg": { s: 10, d: "Perfectly balanced protein. Elite satisfaction." },
+            "chipotle": { s: 7, d: "High protein, but salt can drive water retention." },
+            "birria": { s: 4, d: "Incredible flavor, but high fat density may spike hunger later." }
+        };
+
+        function setTab(tab) {
+            currentTab = tab;
+            document.getElementById('tab-home').classList.toggle('active', tab === 'atHome');
+            document.getElementById('tab-go').classList.toggle('active', tab === 'onGo');
+            document.getElementById('vaultHeader').innerText = `VAULT: ${tab === 'atHome' ? 'AT HOME' : 'ON THE GO'}`;
+            renderVault();
+        }
+
+        const findInput = document.getElementById('find');
+        findInput.onkeypress = (e) => {
+            if(e.key === 'Enter') {
+                const query = findInput.value.toLowerCase();
+                const data = foodData[query] || { s: "?", d: "Analysis pending for the 9:00 PM drop." };
+                document.getElementById('sName').innerText = query;
+                document.getElementById('sNum').innerText = data.s;
+                document.getElementById('sDesc').innerText = data.d;
+                document.getElementById('card').style.display = 'block';
+                findInput.value = '';
+                findInput.blur();
+            }
+        };
+
+        function saveToVault() {
+            const name = document.getElementById('sName').innerText;
+            const score = document.getElementById('sNum').innerText;
+            const history = JSON.parse(localStorage.getItem('ur_vault') || '[]');
+            history.push({ id: Date.now(), name, score, cat: currentTab });
+            localStorage.setItem('ur_vault', JSON.stringify(history));
+            document.getElementById('card').style.display = 'none';
+            renderVault();
+        }
+
+        function deleteItem(id) {
+            let history = JSON.parse(localStorage.getItem('ur_vault') || '[]');
+            history = history.filter(i => i.id !== id);
+            localStorage.setItem('ur_vault', JSON.stringify(history));
+            renderVault();
+        }
+
+        function renderVault() {
+            const history = JSON.parse(localStorage.getItem('ur_vault') || '[]');
+            const list = document.getElementById('vaultList');
+            list.innerHTML = '';
+            history.filter(i => i.cat === currentTab).reverse().forEach(i => {
+                list.innerHTML += `
+                    <div class="vault-item">
+                        <div>
+                            <span style="text-transform:capitalize; font-weight:700;">${i.name}</span>
+                            <span style="color:var(--accent); margin-left:10px; font-weight:900;">${i.score}</span>
+                        </div>
+                        <span class="delete" onclick="deleteItem(${i.id})">×</span>
+                    </div>`;
+            });
+        }
+        renderVault();
+    </script>
+</body>
+</html>
