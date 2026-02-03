@@ -1,88 +1,76 @@
 import React, { useState } from 'react';
 
 export default function App() {
-  const [query, setQuery] = useState('');
+  const [activeTab, setActiveTab] = useState('Home');
+  const [query, setQuery] = useState("");
   const [dailyLog, setDailyLog] = useState([]);
-  const [status, setStatus] = useState('idle'); // idle, loading, error
+  const [status, setStatus] = useState('idle');
 
-  // Using DEMO_KEY for immediate testing
-  const API_KEY = 'DEMO_KEY'; 
+  // ... Your existing handleSearch and findNutrient logic remains here ...
 
-  const handleSearch = async () => {
-    if (!query) return;
-    setStatus('loading');
-    
-    try {
-      const res = await fetch(
-        `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${API_KEY}&query=${encodeURIComponent(query)}&pageSize=1`
-      );
-      const data = await res.json();
-      
-      if (data.foods && data.foods.length > 0) {
-        const food = data.foods[0];
-        
-        // Helper to find nutrient values safely
-        const findNutrient = (id) => {
-          const n = food.foodNutrients.find(nut => nut.nutrientId === id);
-          return n ? Math.round(n.value) : 0;
-        };
-
-        const newEntry = {
-          id: Date.now(),
-          name: food.description,
-          calories: findNutrient(1008),
-          protein: findNutrient(1003),
-          carbs: findNutrient(1005),
-          fat: findNutrient(1004)
-        };
-
-        setDailyLog([newEntry, ...dailyLog]);
-        setQuery('');
-        setStatus('idle');
-      } else {
-        alert("No results found. Try something simple like 'Apple'.");
-        setStatus('idle');
-      }
-    } catch (err) {
-      console.error(err);
-      setStatus('error');
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'Home':
+        return <div><h3>Saved Recipes</h3><p>Your favorite home-cooked meals go here.</p></div>;
+      case 'On the Go':
+        return <div><h3>Takeout & Restaurants</h3><p>Saved meals from your favorite spots.</p></div>;
+      case 'Calendar':
+        return (
+          <div>
+            <h3>Food Journal</h3>
+            {/* Your existing Log Section code */}
+            {dailyLog.map((item) => (
+              <div key={item.id}>{item.name} - {item.calories} kcal</div>
+            ))}
+            {dailyLog.length === 0 && <p>Nothing logged yet.</p>}
+          </div>
+        );
+      case 'Macro':
+        return <div><h3>Macro AI</h3><p>Ask me anything or send a meal plan to your calendar.</p></div>;
+      default:
+        return null;
     }
   };
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'sans-serif', maxWidth: '400px', margin: '0 auto' }}>
-      <h1 style={{ fontSize: '24px', fontWeight: 'bold' }}>Unrestricted</h1>
+    <div style={{ paddingBottom: '70px', fontFamily: 'sans-serif' }}>
+      <h1>Unrestricted</h1>
       
-      {/* Search Section */}
-      <div style={{ marginBottom: '20px', display: 'flex', gap: '8px' }}>
-        <input 
-          style={{ flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid #ddd' }}
-          type="text" 
-          placeholder="Search food..." 
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-        <button 
-          style={{ padding: '12px', backgroundColor: '#0070f3', color: 'white', border: 'none', borderRadius: '8px' }}
-          onClick={handleSearch}
-        >
-          {status === 'loading' ? '...' : 'Add'}
-        </button>
-      </div>
+      {/* Search remains accessible or can be moved into specific tabs */}
+      <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search USDA database..." />
+      <button onClick={handleSearch}>{status === 'loading' ? '...' : 'Add'}</button>
 
-      {/* Log Section */}
-      <div>
-        <h2 style={{ fontSize: '18px', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>Daily Log</h2>
-        {dailyLog.map((item) => (
-          <div key={item.id} style={{ padding: '10px 0', borderBottom: '1px solid #f0f0f0' }}>
-            <div style={{ fontWeight: 'bold', textTransform: 'capitalize' }}>{item.name}</div>
-            <div style={{ fontSize: '14px', color: '#666' }}>
-              {item.calories} kcal | P: {item.protein}g | C: {item.carbs}g | F: {item.fat}g
-            </div>
-          </div>
-        ))}
-        {dailyLog.length === 0 && <p style={{ color: '#999', marginTop: '20px' }}>Nothing logged yet.</p>}
-      </div>
+      <hr />
+      
+      {renderContent()}
+
+      {/* Bottom Navigation Bar */}
+      <nav style={navStyle}>
+        <button onClick={() => setActiveTab('Home')} style={btnStyle}>Home</button>
+        <button onClick={() => setActiveTab('On the Go')} style={btnStyle}>On the Go</button>
+        <button onClick={() => setActiveTab('Calendar')} style={btnStyle}>Calendar</button>
+        <button onClick={() => setActiveTab('Macro')} style={btnStyle}>Macro</button>
+      </nav>
     </div>
   );
 }
+
+const navStyle = {
+  position: 'fixed',
+  bottom: 0,
+  left: 0,
+  right: 0,
+  height: '60px',
+  display: 'flex',
+  justifyContent: 'space-around',
+  alignItems: 'center',
+  background: '#f8f8f8',
+  borderTop: '1px solid #ddd'
+};
+
+const btnStyle = {
+  background: 'none',
+  border: 'none',
+  fontSize: '12px',
+  cursor: 'pointer'
+};
