@@ -6,27 +6,41 @@ export default function App() {
   const [dailyLog, setDailyLog] = useState([]);
   const [status, setStatus] = useState('idle');
 
-  // ... Your existing handleSearch and findNutrient logic remains here ...
-
+  // Logic for the different screens
   const renderContent = () => {
     switch (activeTab) {
       case 'Home':
-        return <div><h3>Saved Recipes</h3><p>Your favorite home-cooked meals go here.</p></div>;
+        return (
+          <div style={sectionStyle}>
+            <h3>Saved Recipes</h3>
+            <p>Your favorite home-cooked meals go here.</p>
+          </div>
+        );
       case 'On the Go':
-        return <div><h3>Takeout & Restaurants</h3><p>Saved meals from your favorite spots.</p></div>;
+        return (
+          <div style={sectionStyle}>
+            <h3>Takeout & Restaurants</h3>
+            <p>Saved meals from your favorite spots.</p>
+          </div>
+        );
       case 'Calendar':
         return (
-          <div>
+          <div style={sectionStyle}>
             <h3>Food Journal</h3>
-            {/* Your existing Log Section code */}
-            {dailyLog.map((item) => (
-              <div key={item.id}>{item.name} - {item.calories} kcal</div>
+            {dailyLog.map((item, index) => (
+              <div key={index}>{item.name} - {item.calories} kcal</div>
             ))}
             {dailyLog.length === 0 && <p>Nothing logged yet.</p>}
           </div>
         );
       case 'Macro':
-        return <div><h3>Macro AI</h3><p>Ask me anything or send a meal plan to your calendar.</p></div>;
+        return (
+          <div style={sectionStyle}>
+            <h3>Macro AI</h3>
+            <p>Ask me anything or send a meal plan to your calendar.</p>
+            {/* Input for AI tool would go here */}
+          </div>
+        );
       default:
         return null;
     }
@@ -34,15 +48,23 @@ export default function App() {
 
   return (
     <div style={{ paddingBottom: '70px', fontFamily: 'sans-serif' }}>
-      <h1>Unrestricted</h1>
+      <h1 style={{ textAlign: 'center' }}>Unrestricted</h1>
       
-      {/* Search remains accessible or can be moved into specific tabs */}
-      <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search USDA database..." />
-      <button onClick={handleSearch}>{status === 'loading' ? '...' : 'Add'}</button>
+      {/* Search Bar (Global) */}
+      <div style={{ padding: '10px', textAlign: 'center' }}>
+        <input 
+          value={query}
+          onChange={(e) => setQuery(e.target.value)} 
+          placeholder="Search USDA database..." 
+          style={{ width: '80%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc' }}
+        />
+        <div>{status === 'loading' ? 'Searching...' : ''}</div>
+      </div>
 
       <hr />
-      
-      {renderContent()}
+
+      {/* Main Content Area */}
+      <main>{renderContent()}</main>
 
       {/* Bottom Navigation Bar */}
       <nav style={navStyle}>
@@ -55,22 +77,12 @@ export default function App() {
   );
 }
 
-const navStyle = {
-  position: 'fixed',
-  bottom: 0,
-  left: 0,
-  right: 0,
-  height: '60px',
-  display: 'flex',
-  justifyContent: 'space-around',
-  alignItems: 'center',
-  background: '#f8f8f8',
-  borderTop: '1px solid #ddd'
+// Simple Styles
+const navStyle = { 
+  position: 'fixed', bottom: 0, left: 0, right: 0, height: '60px', 
+  display: 'flex', justifyContent: 'space-around', alignItems: 'center', 
+  background: '#f8f8f8', borderTop: '1px solid #ddd' 
 };
 
-const btnStyle = {
-  background: 'none',
-  border: 'none',
-  fontSize: '12px',
-  cursor: 'pointer'
-};
+const btnStyle = { background: 'none', border: 'none', fontSize: '12px', cursor: 'pointer', fontWeight: 'bold' };
+const sectionStyle = { padding: '20px' };
