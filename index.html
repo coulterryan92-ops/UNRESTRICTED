@@ -1,102 +1,87 @@
 import React, { useState } from 'react';
 
-export default function UnrestrictedApp() {
+export default function App() {
   const [query, setQuery] = useState('');
   const [dailyLog, setDailyLog] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState('idle'); // idle, loading, error
 
-  // Use 'DEMO_KEY' for now, or paste your actual key between the quotes
+  // Using DEMO_KEY for immediate testing
   const API_KEY = 'DEMO_KEY'; 
 
-  const searchAndAddFood = async () => {
+  const handleSearch = async () => {
     if (!query) return;
-    setLoading(true);
+    setStatus('loading');
     
     try {
-      // 1. Fetch data from USDA
-      const response = await fetch(
+      const res = await fetch(
         `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${API_KEY}&query=${encodeURIComponent(query)}&pageSize=1`
       );
-      const data = await response.json();
+      const data = await res.json();
       
       if (data.foods && data.foods.length > 0) {
         const food = data.foods[0];
         
-        // 2. Extract specific nutrients by their USDA IDs
-        const getVal = (id) => food.foodNutrients.find(n => n.nutrientId === id)?.value || 0;
+        // Helper to find nutrient values safely
+        const findNutrient = (id) => {
+          const n = food.foodNutrients.find(nut => nut.nutrientId === id);
+          return n ? Math.round(n.value) : 0;
+        };
 
         const newEntry = {
           id: Date.now(),
-          name: food.description.toLowerCase(),
-          calories: Math.round(getVal(1008)),
-          protein: Math.round(getVal(1003)),
-          carbs: Math.round(getVal(1005)),
-          fat: Math.round(getVal(1004)),
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          name: food.description,
+          calories: findNutrient(1008),
+          protein: findNutrient(1003),
+          carbs: findNutrient(1005),
+          fat: findNutrient(1004)
         };
 
-        // 3. Update the list
         setDailyLog([newEntry, ...dailyLog]);
         setQuery('');
+        setStatus('idle');
       } else {
-        alert("Food not found in database. Try a simpler name!");
+        alert("No results found. Try something simple like 'Apple'.");
+        setStatus('idle');
       }
-    } catch (error) {
-      console.error("Search error:", error);
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      console.error(err);
+      setStatus('error');
     }
   };
 
   return (
-    <div style={{ maxWidth: '500px', margin: '0 auto', padding: '20px', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', backgroundColor: '#fff', minHeight: '100vh' }}>
+    <div style={{ padding: '20px', fontFamily: 'sans-serif', maxWidth: '400px', margin: '0 auto' }}>
+      <h1 style={{ fontSize: '24px', fontWeight: 'bold' }}>Unrestricted</h1>
       
-      {/* Header */}
-      <header style={{ marginBottom: '30px' }}>
-        <h1 style={{ fontSize: '28px', fontWeight: '800', margin: '0 0 5px 0', color: '#1a1a1a' }}>At Home</h1>
-        <p style={{ color: '#666', margin: '0' }}>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
-      </header>
-
-      {/* Search Bar */}
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '25px' }}>
+      {/* Search Section */}
+      <div style={{ marginBottom: '20px', display: 'flex', gap: '8px' }}>
         <input 
+          style={{ flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid #ddd' }}
           type="text" 
-          value={query} 
+          placeholder="Search food..." 
+          value={query}
           onChange={(e) => setQuery(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && searchAndAddFood()}
-          placeholder="Search foods (e.g. Chicken Breast)"
-          style={{ flex: 1, padding: '15px', borderRadius: '12px', border: '1px solid #e0e0e0', fontSize: '16px', outline: 'none', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}
         />
         <button 
-          onClick={searchAndAddFood}
-          disabled={loading}
-          style={{ padding: '0 20px', backgroundColor: '#007AFF', color: 'white', borderRadius: '12px', border: 'none', fontWeight: '600', cursor: 'pointer' }}
+          style={{ padding: '12px', backgroundColor: '#0070f3', color: 'white', border: 'none', borderRadius: '8px' }}
+          onClick={handleSearch}
         >
-          {loading ? '...' : 'Add'}
+          {status === 'loading' ? '...' : 'Add'}
         </button>
       </div>
 
-      {/* Food Log List */}
+      {/* Log Section */}
       <div>
-        <h3 style={{ fontSize: '18px', marginBottom: '15px', color: '#333' }}>Daily Log</h3>
-        {dailyLog.length === 0 && (
-          <p style={{ color: '#999', textAlign: 'center', marginTop: '40px' }}>No foods logged yet. Start searching above!</p>
-        )}
-        
+        <h2 style={{ fontSize: '18px', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>Daily Log</h2>
         {dailyLog.map((item) => (
-          <div key={item.id} style={{ backgroundColor: '#f9f9f9', padding: '15px', borderRadius: '14px', marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-              <p style={{ margin: '0 0 4px 0', fontWeight: '600', textTransform: 'capitalize', fontSize: '16px' }}>{item.name}</p>
-              <p style={{ margin: '0', fontSize: '13px', color: '#888' }}>
-                {item.protein}g Protein • {item.carbs}g Carbs • {item.fat}g Fat
-              </p>
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <p style={{ margin: '0', fontWeight: '700', fontSize: '18px', color: '#007AFF' }}>{item.calories}</p>
-              <p style={{ margin: '0', fontSize: '11px', color: '#bbb' }}>KCAL</p>
+          <div key={item.id} style={{ padding: '10px 0', borderBottom: '1px solid #f0f0f0' }}>
+            <div style={{ fontWeight: 'bold', textTransform: 'capitalize' }}>{item.name}</div>
+            <div style={{ fontSize: '14px', color: '#666' }}>
+              {item.calories} kcal | P: {item.protein}g | C: {item.carbs}g | F: {item.fat}g
             </div>
           </div>
         ))}
+        {dailyLog.length === 0 && <p style={{ color: '#999', marginTop: '20px' }}>Nothing logged yet.</p>}
       </div>
     </div>
   );
