@@ -1,88 +1,107 @@
-import React, { useState } from 'react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UNRESTRICTED</title>
+    <style>
+        :root { --accent: #b2ffda; --bg: #0f1113; --card: rgba(255, 255, 255, 0.05); --text: #f5f5f5; --glass: blur(15px); }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px 20px 120px 20px; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+        
+        .header { text-align: center; margin: 30px 0; }
+        h1 { font-size: 1.3rem; letter-spacing: 7px; font-weight: 800; text-transform: uppercase; margin: 0; opacity: 0.9; }
 
-export default function App() {
-  const [activeTab, setActiveTab] = useState('Home');
-  const [query, setQuery] = useState("");
-  const [dailyLog, setDailyLog] = useState([]);
-  const [status, setStatus] = useState('idle');
+        .view { width: 100%; max-width: 400px; display: none; animation: fadeIn 0.4s ease; margin: 0 auto; }
+        .view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-  // Logic for the different screens
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'Home':
-        return (
-          <div style={sectionStyle}>
-            <h3>Saved Recipes</h3>
-            <p>Your favorite home-cooked meals go here.</p>
-          </div>
-        );
-      case 'On the Go':
-        return (
-          <div style={sectionStyle}>
-            <h3>Takeout & Restaurants</h3>
-            <p>Saved meals from your favorite spots.</p>
-          </div>
-        );
-      case 'Calendar':
-        return (
-          <div style={sectionStyle}>
-            <h3>Food Journal</h3>
-            {dailyLog.map((item, index) => (
-              <div key={index}>{item.name} - {item.calories} kcal</div>
-            ))}
-            {dailyLog.length === 0 && <p>Nothing logged yet.</p>}
-          </div>
-        );
-      case 'Macro':
-        return (
-          <div style={sectionStyle}>
-            <h3>Macro AI</h3>
-            <p>Ask me anything or send a meal plan to your calendar.</p>
-            {/* Input for AI tool would go here */}
-          </div>
-        );
-      default:
-        return null;
-    }
-  };
+        .section-card { background: var(--card); border-radius: 28px; padding: 25px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 20px; backdrop-filter: var(--glass); }
+        .search-bar { width: 100%; padding: 20px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white; outline: none; box-sizing: border-box; margin-bottom: 25px; font-size: 16px; }
+        .search-bar:focus { border-color: var(--accent); }
 
-  return (
-    <div style={{ paddingBottom: '70px', fontFamily: 'sans-serif' }}>
-      <h1 style={{ textAlign: 'center' }}>Unrestricted</h1>
-      
-      {/* Search Bar (Global) */}
-      <div style={{ padding: '10px', textAlign: 'center' }}>
-        <input 
-          value={query}
-          onChange={(e) => setQuery(e.target.value)} 
-          placeholder="Search USDA database..." 
-          style={{ width: '80%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc' }}
-        />
-        <div>{status === 'loading' ? 'Searching...' : ''}</div>
-      </div>
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 17, 19, 0.96); backdrop-filter: var(--glass); display: flex; justify-content: space-around; padding: 15px 5px 35px 5px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #555; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; flex: 1; transition: 0.3s; }
+        .nav-item.active { color: var(--accent); }
+        .nav-icon { font-size: 1.3rem; margin-bottom: 6px; }
 
-      <hr />
+        .entry { display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .entry:last-child { border-bottom: none; }
+        .item-label { font-size: 0.7rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; font-weight: 800; }
+    </style>
+</head>
+<body>
 
-      {/* Main Content Area */}
-      <main>{renderContent()}</main>
+    <div class="header"><h1>UNRESTRICTED</h1></div>
 
-      {/* Bottom Navigation Bar */}
-      <nav style={navStyle}>
-        <button onClick={() => setActiveTab('Home')} style={btnStyle}>Home</button>
-        <button onClick={() => setActiveTab('On the Go')} style={btnStyle}>On the Go</button>
-        <button onClick={() => setActiveTab('Calendar')} style={btnStyle}>Calendar</button>
-        <button onClick={() => setActiveTab('Macro')} style={btnStyle}>Macro</button>
-      </nav>
+    <div id="home" class="view active">
+        <div class="item-label">At Home Strategy</div>
+        <input type="text" class="search-bar" placeholder="Enter a recipe..." onkeypress="addEntry(event, 'home')">
+        <div class="section-card" id="homeList"></div>
     </div>
-  );
-}
 
-// Simple Styles
-const navStyle = { 
-  position: 'fixed', bottom: 0, left: 0, right: 0, height: '60px', 
-  display: 'flex', justifyContent: 'space-around', alignItems: 'center', 
-  background: '#f8f8f8', borderTop: '1px solid #ddd' 
-};
+    <div id="go" class="view">
+        <div class="item-label">On The Go Strategy</div>
+        <input type="text" class="search-bar" placeholder="Enter a restaurant..." onkeypress="addEntry(event, 'go')">
+        <div class="section-card" id="goList"></div>
+    </div>
 
-const btnStyle = { background: 'none', border: 'none', fontSize: '12px', cursor: 'pointer', fontWeight: 'bold' };
-const sectionStyle = { padding: '20px' };
+    <div id="calendar" class="view">
+        <div class="item-label">Daily Journal</div>
+        <div class="section-card" id="journalList"></div>
+    </div>
+
+    <div id="macro" class="view">
+        <div class="section-card" style="text-align:center; padding:50px 20px;">
+            <div style="font-size:3rem; margin-bottom:20px; filter: drop-shadow(0 0 10px var(--accent));">✨</div>
+            <h2 style="color:var(--accent); letter-spacing:5px; font-weight:200; margin:0;">MACRO</h2>
+            <p style="color:#888; font-size:0.9rem; line-height:1.7; margin: 25px 0;">Your strategic partner for meal planning and real-time intelligence.</p>
+            <p style="font-size:0.75rem; color:var(--accent); font-weight:800; letter-spacing:2px; margin-top:25px;">ONLINE AT 9:00 PM</p>
+        </div>
+    </div>
+
+    <nav class="nav-bar">
+        <div class="nav-item active" onclick="showView('home', this)"><span class="nav-icon">🏠</span><span>At Home</span></div>
+        <div class="nav-item" onclick="showView('go', this)"><span class="nav-icon">🏃</span><span>On Go</span></div>
+        <div class="nav-item" onclick="showView('calendar', this)"><span class="nav-icon">📅</span><span>Calendar</span></div>
+        <div class="nav-item" onclick="showView('macro', this)"><span class="nav-icon">✨</span><span>Macro</span></div>
+    </nav>
+
+    <script>
+        function showView(id, el) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            el.classList.add('active');
+            render();
+        }
+
+        function addEntry(e, cat) {
+            if(e.key === 'Enter' && e.target.value.trim() !== '') {
+                const db = JSON.parse(localStorage.getItem('ur_v3_1') || '[]');
+                db.push({ id: Date.now(), text: e.target.value, cat: cat, date: new Date().toLocaleDateString() });
+                localStorage.setItem('ur_v3_1', JSON.stringify(db));
+                e.target.value = '';
+                render();
+            }
+        }
+
+        function render() {
+            const db = JSON.parse(localStorage.getItem('ur_v3_1') || '[]');
+            const home = document.getElementById('homeList');
+            const go = document.getElementById('goList');
+            const cal = document.getElementById('journalList');
+
+            const makeHtml = (items) => items.map(i => `
+                <div class="entry">
+                    <span style="font-weight:500;">${i.text}</span>
+                    <span style="color:#444; font-size:0.7rem; font-weight:700;">${i.date}</span>
+                </div>`).join('');
+
+            home.innerHTML = makeHtml(db.filter(i => i.cat === 'home')) || '<p style="color:#444; font-size:0.8rem; text-align:center;">No recipes saved yet.</p>';
+            go.innerHTML = makeHtml(db.filter(i => i.cat === 'go')) || '<p style="color:#444; font-size:0.8rem; text-align:center;">No spots saved yet.</p>';
+            cal.innerHTML = makeHtml(db) || '<p style="color:#444; font-size:0.8rem; text-align:center;">Your timeline is currently empty.</p>';
+        }
+        render();
+    </script>
+</body>
+</html>
