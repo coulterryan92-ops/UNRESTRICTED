@@ -1,111 +1,103 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>UNRESTRICTED</title>
-    <style>
-        :root { --accent: #b2ffda; --bg: #0f1113; --card: rgba(255, 255, 255, 0.05); --text: #f5f5f5; --glass: blur(15px); }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px 20px 120px 20px; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+import React, { useState } from 'react';
+
+export default function UnrestrictedApp() {
+  const [query, setQuery] = useState('');
+  const [dailyLog, setDailyLog] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  // Use 'DEMO_KEY' for now, or paste your actual key between the quotes
+  const API_KEY = 'DEMO_KEY'; 
+
+  const searchAndAddFood = async () => {
+    if (!query) return;
+    setLoading(true);
+    
+    try {
+      // 1. Fetch data from USDA
+      const response = await fetch(
+        `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${API_KEY}&query=${encodeURIComponent(query)}&pageSize=1`
+      );
+      const data = await response.json();
+      
+      if (data.foods && data.foods.length > 0) {
+        const food = data.foods[0];
         
-        .header { text-align: center; margin: 30px 0; }
-        h1 { font-size: 1.3rem; letter-spacing: 7px; font-weight: 800; text-transform: uppercase; margin: 0; opacity: 0.9; }
+        // 2. Extract specific nutrients by their USDA IDs
+        const getVal = (id) => food.foodNutrients.find(n => n.nutrientId === id)?.value || 0;
 
-        .view { width: 100%; max-width: 400px; display: none; animation: fadeIn 0.4s ease; margin: 0 auto; }
-        .view.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        const newEntry = {
+          id: Date.now(),
+          name: food.description.toLowerCase(),
+          calories: Math.round(getVal(1008)),
+          protein: Math.round(getVal(1003)),
+          carbs: Math.round(getVal(1005)),
+          fat: Math.round(getVal(1004)),
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
 
-        .section-card { background: var(--card); border-radius: 28px; padding: 25px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 20px; backdrop-filter: var(--glass); }
-        .search-bar { width: 100%; padding: 20px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white; outline: none; box-sizing: border-box; margin-bottom: 25px; font-size: 16px; }
-        .search-bar:focus { border-color: var(--accent); }
+        // 3. Update the list
+        setDailyLog([newEntry, ...dailyLog]);
+        setQuery('');
+      } else {
+        alert("Food not found in database. Try a simpler name!");
+      }
+    } catch (error) {
+      console.error("Search error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        /* Bottom Nav */
-        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 17, 19, 0.96); backdrop-filter: var(--glass); display: flex; justify-content: space-around; padding: 15px 5px 35px 5px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #555; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; flex: 1; transition: 0.3s; }
-        .nav-item.active { color: var(--accent); }
-        .nav-icon { font-size: 1.3rem; margin-bottom: 6px; }
+  return (
+    <div style={{ maxWidth: '500px', margin: '0 auto', padding: '20px', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', backgroundColor: '#fff', minHeight: '100vh' }}>
+      
+      {/* Header */}
+      <header style={{ marginBottom: '30px' }}>
+        <h1 style={{ fontSize: '28px', fontWeight: '800', margin: '0 0 5px 0', color: '#1a1a1a' }}>At Home</h1>
+        <p style={{ color: '#666', margin: '0' }}>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+      </header>
 
-        /* List Styling */
-        .entry { display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
-        .entry:last-child { border-bottom: none; }
-        .item-label { font-size: 0.7rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; font-weight: 800; }
-    </style>
-</head>
-<body>
+      {/* Search Bar */}
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '25px' }}>
+        <input 
+          type="text" 
+          value={query} 
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && searchAndAddFood()}
+          placeholder="Search foods (e.g. Chicken Breast)"
+          style={{ flex: 1, padding: '15px', borderRadius: '12px', border: '1px solid #e0e0e0', fontSize: '16px', outline: 'none', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}
+        />
+        <button 
+          onClick={searchAndAddFood}
+          disabled={loading}
+          style={{ padding: '0 20px', backgroundColor: '#007AFF', color: 'white', borderRadius: '12px', border: 'none', fontWeight: '600', cursor: 'pointer' }}
+        >
+          {loading ? '...' : 'Add'}
+        </button>
+      </div>
 
-    <div class="header"><h1>UNRESTRICTED</h1></div>
-
-    <div id="home" class="view active">
-        <div class="item-label">At Home Strategy</div>
-        <input type="text" class="search-bar" placeholder="Enter a recipe..." onkeypress="addEntry(event, 'home')">
-        <div class="section-card" id="homeList"></div>
+      {/* Food Log List */}
+      <div>
+        <h3 style={{ fontSize: '18px', marginBottom: '15px', color: '#333' }}>Daily Log</h3>
+        {dailyLog.length === 0 && (
+          <p style={{ color: '#999', textAlign: 'center', marginTop: '40px' }}>No foods logged yet. Start searching above!</p>
+        )}
+        
+        {dailyLog.map((item) => (
+          <div key={item.id} style={{ backgroundColor: '#f9f9f9', padding: '15px', borderRadius: '14px', marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <p style={{ margin: '0 0 4px 0', fontWeight: '600', textTransform: 'capitalize', fontSize: '16px' }}>{item.name}</p>
+              <p style={{ margin: '0', fontSize: '13px', color: '#888' }}>
+                {item.protein}g Protein • {item.carbs}g Carbs • {item.fat}g Fat
+              </p>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <p style={{ margin: '0', fontWeight: '700', fontSize: '18px', color: '#007AFF' }}>{item.calories}</p>
+              <p style={{ margin: '0', fontSize: '11px', color: '#bbb' }}>KCAL</p>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
-
-    <div id="go" class="view">
-        <div class="item-label">On The Go Strategy</div>
-        <input type="text" class="search-bar" placeholder="Enter a restaurant..." onkeypress="addEntry(event, 'go')">
-        <div class="section-card" id="goList"></div>
-    </div>
-
-    <div id="calendar" class="view">
-        <div class="item-label">Daily Journal</div>
-        <div class="section-card" id="journalList"></div>
-    </div>
-
-    <div id="macro" class="view">
-        <div class="section-card" style="text-align:center; padding:50px 20px;">
-            <div style="font-size:3rem; margin-bottom:20px; filter: drop-shadow(0 0 10px var(--accent));">✨</div>
-            <h2 style="color:var(--accent); letter-spacing:5px; font-weight:200; margin:0;">MACRO</h2>
-            <p style="color:#888; font-size:0.9rem; line-height:1.7; margin: 25px 0;">Your strategic partner for meal planning and real-time intelligence.</p>
-            <div style="height:1px; width:40px; background:var(--accent); margin: 0 auto; opacity:0.3;"></div>
-            <p style="font-size:0.75rem; color:var(--accent); font-weight:800; letter-spacing:2px; margin-top:25px;">ONLINE AT 9:00 PM</p>
-        </div>
-    </div>
-
-    <nav class="nav-bar">
-        <div class="nav-item active" onclick="showView('home', this)"><span class="nav-icon">🏠</span><span>At Home</span></div>
-        <div class="nav-item" onclick="showView('go', this)"><span class="nav-icon">🏃</span><span>On Go</span></div>
-        <div class="nav-item" onclick="showView('calendar', this)"><span class="nav-icon">📅</span><span>Calendar</span></div>
-        <div class="nav-item" onclick="showView('macro', this)"><span class="nav-icon">✨</span><span>Macro</span></div>
-    </nav>
-
-    <script>
-        function showView(id, el) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            el.classList.add('active');
-            render();
-        }
-
-        function addEntry(e, cat) {
-            if(e.key === 'Enter' && e.target.value.trim() !== '') {
-                const db = JSON.parse(localStorage.getItem('ur_v3_1') || '[]');
-                db.push({ id: Date.now(), text: e.target.value, cat: cat, date: new Date().toLocaleDateString() });
-                localStorage.setItem('ur_v3_1', JSON.stringify(db));
-                e.target.value = '';
-                render();
-            }
-        }
-
-        function render() {
-            const db = JSON.parse(localStorage.getItem('ur_v3_1') || '[]');
-            const home = document.getElementById('homeList');
-            const go = document.getElementById('goList');
-            const cal = document.getElementById('journalList');
-
-            const makeHtml = (items) => items.map(i => `
-                <div class="entry">
-                    <span style="font-weight:500;">${i.text}</span>
-                    <span style="color:#444; font-size:0.7rem; font-weight:700;">${i.date}</span>
-                </div>`).join('');
-
-            home.innerHTML = makeHtml(db.filter(i => i.cat === 'home')) || '<p style="color:#444; font-size:0.8rem; text-align:center;">No recipes saved yet.</p>';
-            go.innerHTML = makeHtml(db.filter(i => i.cat === 'go')) || '<p style="color:#444; font-size:0.8rem; text-align:center;">No spots saved yet.</p>';
-            cal.innerHTML = makeHtml(db) || '<p style="color:#444; font-size:0.8rem; text-align:center;">Your timeline is currently empty.</p>';
-        }
-
-        render();
-    </script>
-</body>
-</html>
+  );
+}
