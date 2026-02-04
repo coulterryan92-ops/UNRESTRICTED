@@ -5,63 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>UNRESTRICTED</title>
     <style>
-        :root { 
-            --bg: #0f1113; --card: rgba(255, 255, 255, 0.04); --text: #f5f5f5; --glass: blur(16px);
-            --un-green: #00e676; --un-yellow: #ffca28; --un-red: #ff5252;
-        }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px 20px 140px 20px; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+        :root { --bg: #0f1113; --card: rgba(255, 255, 255, 0.04); --text: #f5f5f5; --glass: blur(16px); --un-green: #00e676; --un-yellow: #ffca28; --un-red: #ff5252; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px 20px 140px 20px; min-height: 100vh; }
         .header { text-align: center; margin: 40px 0 25px; }
         h1 { font-size: 1.4rem; letter-spacing: 8px; font-weight: 800; text-transform: uppercase; color: #fff; margin: 0; }
-        .tagline { color: var(--un-green); font-size: 0.6rem; letter-spacing: 3px; text-transform: uppercase; margin-top: 10px; opacity: 0.8; font-weight: 600; }
         
+        /* CALENDAR GRID STYLES */
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 10px; }
+        .cal-title { font-size: 1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
+        .cal-btn { background: none; border: 1px solid rgba(255,255,255,0.1); color: var(--text); padding: 8px 12px; border-radius: 10px; cursor: pointer; }
+        
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 20px; }
+        .day-label { text-align: center; font-size: 0.6rem; color: #666; font-weight: 700; text-transform: uppercase; margin-bottom: 10px; }
+        
+        .day-cell { 
+            aspect-ratio: 1; background: rgba(255,255,255,0.02); border-radius: 12px; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            font-size: 0.8rem; position: relative; cursor: pointer; border: 1px solid transparent;
+        }
+        .day-cell.today { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); }
+        .day-cell.selected { background: var(--un-green); color: #000; font-weight: 800; box-shadow: 0 0 15px rgba(0,230,118,0.3); }
+        .day-cell.has-data::after { content: ''; width: 4px; height: 4px; background: var(--un-green); border-radius: 50%; position: absolute; bottom: 6px; }
+        .day-cell.selected.has-data::after { background: #000; }
+        .day-cell.empty { background: transparent; cursor: default; }
+
+        /* General UI */
         .view { width: 100%; max-width: 420px; display: none; animation: slideUp 0.4s ease; margin: 0 auto; }
         .view.active { display: block; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .search-bar { width: 100%; padding: 22px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: white; font-size: 16px; outline: none; box-sizing: border-box; margin-bottom: 25px; backdrop-filter: var(--glass); }
         .section-card { background: var(--card); border-radius: 35px; padding: 30px; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 20px; backdrop-filter: var(--glass); }
-        
         #resBox { display: none; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
         .score-circle { width: 90px; height: 90px; border: 2px solid #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.4rem; margin: 0 auto 15px; font-weight: 200; }
-        
-        .macro-row { display: flex; justify-content: space-around; margin: 25px 0; padding: 15px 0; border-top: 1px solid rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .macro-row { display: flex; justify-content: space-around; margin: 20px 0; padding: 15px 0; border-top: 1px solid rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.04); }
         .macro-item { display: flex; flex-direction: column; }
         .macro-val { font-weight: 700; color: #fff; font-size: 1.1rem; }
         .macro-label { font-size: 0.55rem; text-transform: uppercase; color: #666; letter-spacing: 1.5px; margin-top: 6px; }
-
+        
         .log-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .log-tab { flex: 1; padding: 14px; border-radius: 16px; background: rgba(255,255,255,0.03); text-align: center; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #555; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); }
-        .log-tab.active { background: var(--card); color: var(--un-green); border-color: var(--un-green); }
-
-        .save-btn { flex: 1; background: #333; color: #000; border: none; padding: 18px; border-radius: 18px; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.2s; }
-        .save-btn:active { transform: scale(0.95); }
+        .log-tab { flex: 1; padding: 14px; border-radius: 16px; background: rgba(255,255,255,0.03); text-align: center; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #555; cursor: pointer; }
+        .log-tab.active { background: var(--card); color: var(--un-green); }
+        .save-btn { flex: 1; background: #333; color: #000; border: none; padding: 18px; border-radius: 18px; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
+        .entry { display: flex; justify-content: space-between; align-items: center; padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .delete-btn { color: #333; font-size: 1rem; padding: 5px 10px; cursor: pointer; }
 
         .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 17, 19, 0.98); backdrop-filter: blur(25px); display: flex; justify-content: space-around; padding: 15px 10px 40px 10px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: #444; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; flex: 1; }
         .nav-item.active { color: var(--un-green); }
         .nav-icon { font-size: 1.4rem; margin-bottom: 8px; }
-
-        /* Delete Feature Styling */
-        .entry { display: flex; justify-content: space-between; align-items: center; padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
-        .entry-info { display: flex; align-items: center; gap: 15px; }
-        .delete-btn { color: #333; font-size: 1.2rem; padding: 5px 10px; cursor: pointer; transition: 0.2s; }
-        .delete-btn:hover { color: var(--un-red); }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>UNRESTRICTED</h1>
-        <div class="tagline">System Status: Active</div>
-    </div>
+    <div class="header"><h1>UNRESTRICTED</h1></div>
 
-    <div id="find" class="view active">
+    <div id="search" class="view active">
         <form onsubmit="event.preventDefault(); handleSearch();">
-            <input type="search" id="searchInput" class="search-bar" placeholder="Find food (e.g. Steak, Apple)...">
+            <input type="search" id="searchInput" class="search-bar" placeholder="Analyze food (e.g. Steak)...">
         </form>
         <div id="resBox" class="section-card"></div>
         <div class="section-card" style="text-align: center; padding: 40px 20px;">
-            <p style="color: #444; font-size: 0.8rem; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700;">Global USDA Search Active</p>
+            <p style="color: #444; font-size: 0.8rem; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700;">Local Database: Active</p>
         </div>
     </div>
 
@@ -74,8 +79,17 @@
     </div>
 
     <div id="calendar" class="view">
-        <div style="font-size: 0.65rem; color: var(--un-green); letter-spacing: 3px; margin-bottom: 15px; text-transform: uppercase; font-weight: 800; text-align: center;">Strategy Timeline</div>
-        <div class="section-card" id="journalList"></div>
+        <div class="section-card">
+            <div class="cal-header">
+                <button class="cal-btn" onclick="changeMonth(-1)">←</button>
+                <div id="calMonthTitle" class="cal-title"></div>
+                <button class="cal-btn" onclick="changeMonth(1)">→</button>
+            </div>
+            <div class="cal-grid" id="calGrid">
+                </div>
+        </div>
+        <div class="section-card" id="dayLog">
+            </div>
     </div>
 
     <div id="macro" class="view">
@@ -87,127 +101,159 @@
     </div>
 
     <nav class="nav-bar">
-        <div class="nav-item active" onclick="showView('find', this)"><span class="nav-icon">🔍</span><span>Find Food</span></div>
+        <div class="nav-item active" onclick="showView('search', this)"><span class="nav-icon">🔍</span><span>Search</span></div>
         <div class="nav-item" onclick="showView('log', this)"><span class="nav-icon">📋</span><span>Log</span></div>
-        <div class="nav-item" onclick="showView('calendar', this)"><span class="nav-icon">📅</span><span>Calendar</span></div>
+        <div class="nav-item" onclick="showView('calendar', this)"><span class="nav-icon">📅</span><span>Timeline</span></div>
         <div class="nav-item" onclick="showView('macro', this)"><span class="nav-icon">✨</span><span>Macro</span></div>
     </nav>
 
     <script>
-        const API_KEY = 'CEUxSOUWTNLeiPciBkeaFUCWx6cwGvS5QiZSDhqo'.trim();
-        let currentLogTab = 'home';
+        // CORE DB (Verified)
+        const localDB = [
+            {n:"steak (ribeye)", p:24, c:0, f:22, cal:291, fib:0, sug:0},
+            {n:"chicken breast", p:31, c:0, f:3.6, cal:165, fib:0, sug:0},
+            {n:"egg (whole)", p:12, c:1, f:11, cal:155, fib:0, sug:0},
+            {n:"salmon", p:25, c:0, f:13, cal:208, fib:0, sug:0},
+            {n:"rice (white)", p:2.7, c:28, f:0.3, cal:130, fib:0.4, sug:0},
+            {n:"avocado", p:2, c:9, f:15, cal:160, fib:7, sug:0.7},
+            {n:"sweet potato", p:1.6, c:20, f:0.1, cal:86, fib:3, sug:4.2},
+            {n:"apple", p:0.3, c:14, f:0.2, cal:52, fib:2.4, sug:10},
+            {n:"banana", p:1.1, c:23, f:0.3, cal:89, fib:2.6, sug:12},
+            {n:"chipotle bowl", p:35, c:40, f:22, cal:650, fib:8, sug:3},
+            {n:"pizza (slice)", p:11, c:33, f:10, cal:266, fib:2, sug:4}
+        ];
 
-        const mockData = {
-            "apple": { p: 0.3, f: 0.2, c: 14, cal: 52, fib: 2.4, sug: 10, desc: "fresh apple" },
-            "steak": { p: 25, f: 19, c: 0, cal: 271, fib: 0, sug: 0, desc: "ribeye steak" },
-            "pizza": { p: 11, f: 10, c: 33, cal: 266, fib: 2, sug: 4, desc: "cheese pizza" }
+        let currentLogTab = 'home';
+        // Calendar State
+        let today = new Date();
+        let currentMonth = today.getMonth();
+        let currentYear = today.getFullYear();
+        let selectedDateStr = today.toLocaleDateString();
+
+        window.onload = function() {
+            renderCalendar();
+            render();
         };
 
-        async function handleSearch() {
-            const query = document.getElementById('searchInput').value.trim().toLowerCase();
-            if(!query) return;
-            const resBox = document.getElementById('resBox');
-            resBox.innerHTML = '<p style="color:var(--un-yellow); font-size:0.7rem; letter-spacing:2px;">SEARCHING...</p>';
-            resBox.style.display = 'block';
+        // --- CALENDAR LOGIC ---
+        function renderCalendar() {
+            const grid = document.getElementById('calGrid');
+            const title = document.getElementById('calMonthTitle');
+            grid.innerHTML = '';
 
-            try {
-                const url = `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${API_KEY}&query=${encodeURIComponent(query)}&pageSize=1`;
-                const response = await fetch(url);
-                const data = await response.json();
+            // Set Title
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            title.innerText = `${monthNames[currentMonth]} ${currentYear}`;
 
-                if (response.ok && data.foods && data.foods.length > 0) {
-                    displayFood(data.foods[0], false);
-                } else if (mockData[query]) {
-                    displayFood(mockData[query], true);
-                } else {
-                    throw new Error("No results.");
-                }
-            } catch (err) {
-                if (mockData[query]) displayFood(mockData[query], true);
-                else resBox.innerHTML = `<p style="color:var(--un-red); font-size:0.7rem;">USDA KEY SLEEPING.</p>`;
+            // Day Labels
+            const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+            days.forEach(d => grid.innerHTML += `<div class="day-label">${d}</div>`);
+
+            // Calculate Grid
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const db = JSON.parse(localStorage.getItem('ur_v7_1') || '[]');
+
+            // Empty Cells
+            for (let i = 0; i < firstDay; i++) {
+                grid.innerHTML += `<div class="day-cell empty"></div>`;
+            }
+
+            // Day Cells
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateObj = new Date(currentYear, currentMonth, d);
+                const dStr = dateObj.toLocaleDateString();
+                const isToday = dStr === new Date().toLocaleDateString();
+                const isSelected = dStr === selectedDateStr;
+                const hasData = db.some(entry => entry.date === dStr);
+
+                const cell = document.createElement('div');
+                cell.className = `day-cell ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${hasData ? 'has-data' : ''}`;
+                cell.innerText = d;
+                cell.onclick = () => { selectedDateStr = dStr; renderCalendar(); render(); };
+                grid.appendChild(cell);
             }
         }
 
-        function displayFood(food, isMock) {
-            let p, f, c, cal, fib, sug, name;
-            if (isMock) {
-                ({p, f, c, cal, fib, sug} = food); name = food.desc;
+        function changeMonth(dir) {
+            currentMonth += dir;
+            if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+            renderCalendar();
+        }
+
+        // --- SEARCH & DATA LOGIC ---
+        function handleSearch() {
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            const resBox = document.getElementById('resBox');
+            resBox.style.display = 'block';
+
+            const match = localDB.find(f => f.n.includes(query));
+
+            if (match) {
+                const {p, c, f, cal, fib, sug} = match;
+                let score = ( (p * 2) + (fib * 3) ) / ( (cal / 100) + (sug / 2) + 1 );
+                score = Math.min(10, Math.max(1, score + 5));
+                const color = score > 7.0 ? 'var(--un-green)' : (score > 5.0 ? 'var(--un-yellow)' : 'var(--un-red)');
+
+                resBox.innerHTML = `
+                    <div class="score-circle" style="color:${color}; border-color:${color};">${score.toFixed(1)}</div>
+                    <div style="font-size:0.7rem; font-weight:800; opacity:0.5;">${Math.round(cal)} CALORIES</div>
+                    <h2 style="text-transform:capitalize; margin:10px 0;">${match.n}</h2>
+                    <div class="macro-row">
+                        <div class="macro-item"><span class="macro-val">${p}g</span><span class="macro-label">Prot</span></div>
+                        <div class="macro-item"><span class="macro-val">${c}g</span><span class="macro-label">Carb</span></div>
+                        <div class="macro-item"><span class="macro-val">${f}g</span><span class="macro-label">Fat</span></div>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <button class="save-btn" style="background:${color}" onclick="saveEntry('${match.n}', ${score.toFixed(1)}, '${color}', 'home')">Log to ${selectedDateStr}</button>
+                    </div>`;
             } else {
-                const getNut = (id) => food.foodNutrients.find(n => n.nutrientId === id)?.value || 0;
-                p = getNut(1003); f = getNut(1004); c = getNut(1005); cal = getNut(1008); fib = getNut(1079); sug = getNut(2000);
-                name = food.description.toLowerCase();
+                resBox.innerHTML = '<p style="color:var(--un-red);">Not in Core DB. Try "Steak".</p>';
             }
-
-            let score = ( (p * 2) + (fib * 3) ) / ( (cal / 100) + (sug / 2) + 1 );
-            score = Math.min(10, Math.max(1, score + 5));
-            const color = score > 7.0 ? 'var(--un-green)' : (score > 5.0 ? 'var(--un-yellow)' : 'var(--un-red)');
-
-            document.getElementById('resBox').innerHTML = `
-                <div class="score-circle" style="color:${color}; border-color:${color};">${score.toFixed(1)}</div>
-                <div style="font-size:0.75rem; font-weight:800; opacity:0.5; margin-bottom:10px;">${Math.round(cal)} CALORIES</div>
-                <h2 style="text-transform:capitalize; margin:0; font-weight:500;">${name}</h2>
-                <div class="macro-row">
-                    <div class="macro-item"><span class="macro-val">${Math.round(p)}g</span><span class="macro-label">Prot</span></div>
-                    <div class="macro-item"><span class="macro-val">${Math.round(c)}g</span><span class="macro-label">Carb</span></div>
-                    <div class="macro-item"><span class="macro-val">${Math.round(f)}g</span><span class="macro-label">Fat</span></div>
-                </div>
-                <div style="display:flex; gap:10px;">
-                    <button class="save-btn" style="background:${color}" onclick="saveEntry('${name}', ${score.toFixed(1)}, '${color}', 'home')">At Home</button>
-                    <button class="save-btn" style="background:${color}" onclick="saveEntry('${name}', ${score.toFixed(1)}, '${color}', 'go')">On Go</button>
-                </div>
-            `;
         }
 
         function saveEntry(name, score, color, cat) {
-            const db = JSON.parse(localStorage.getItem('ur_v5_5') || '[]');
-            db.push({ id: Date.now(), text: name, score: score, color: color, cat: cat, date: new Date().toLocaleDateString() });
-            localStorage.setItem('ur_v5_5', JSON.stringify(db));
+            const db = JSON.parse(localStorage.getItem('ur_v7_1') || '[]');
+            db.push({ id: Date.now(), text: name, score: score, color: color, cat: cat, date: selectedDateStr });
+            localStorage.setItem('ur_v7_1', JSON.stringify(db));
             document.getElementById('resBox').style.display = 'none';
             document.getElementById('searchInput').value = '';
+            renderCalendar(); // Update dots
             render();
+            showView('calendar', document.querySelectorAll('.nav-item')[2]);
         }
 
-        // DELETE FUNCTION
         function deleteEntry(id) {
-            let db = JSON.parse(localStorage.getItem('ur_v5_5') || '[]');
-            db = db.filter(item => item.id !== id);
-            localStorage.setItem('ur_v5_5', JSON.stringify(db));
+            let db = JSON.parse(localStorage.getItem('ur_v7_1') || '[]');
+            db = db.filter(i => i.id !== id);
+            localStorage.setItem('ur_v7_1', JSON.stringify(db));
+            renderCalendar();
             render();
         }
 
-        function setLogTab(tab) {
-            currentLogTab = tab;
-            document.getElementById('tabAtHome').classList.toggle('active', tab === 'home');
-            document.getElementById('tabOnGo').classList.toggle('active', tab === 'go');
-            render();
-        }
-
+        // --- VIEWS ---
         function showView(id, el) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             el.classList.add('active');
-            render();
         }
+
+        function setLogTab(tab) { currentLogTab = tab; render(); document.getElementById('tabAtHome').classList.toggle('active', tab === 'home'); document.getElementById('tabOnGo').classList.toggle('active', tab === 'go'); }
 
         function render() {
-            const db = JSON.parse(localStorage.getItem('ur_v5_5') || '[]');
-            const logContent = document.getElementById('logContent');
-            const calList = document.getElementById('journalList');
+            const db = JSON.parse(localStorage.getItem('ur_v7_1') || '[]');
             
-            const makeEntry = (i) => `
-                <div class="entry">
-                    <div class="entry-info">
-                        <span style="text-transform:capitalize; font-weight:600;">${i.text}</span>
-                        <span style="color:${i.color}; font-weight:800; font-size:0.9rem;">${i.score}</span>
-                    </div>
-                    <div class="delete-btn" onclick="deleteEntry(${i.id})">✕</div>
-                </div>`;
-
-            logContent.innerHTML = db.filter(i => i.cat === currentLogTab).map(makeEntry).join('') || '<p style="text-align:center; color:#444; font-size:0.7rem;">Nothing logged.</p>';
-            calList.innerHTML = db.map(makeEntry).join('') || '<p style="text-align:center; color:#444; font-size:0.7rem;">Journal clear.</p>';
+            // Render General Log (Tabbed)
+            const makeItem = (i) => `<div class="entry"><div style="display:flex;align-items:center;gap:15px;"><span style="text-transform:capitalize;font-weight:600;">${i.text}</span><span style="color:${i.color};font-weight:800;">${i.score}</span></div><div class="delete-btn" onclick="deleteEntry(${i.id})">✕</div></div>`;
+            document.getElementById('logContent').innerHTML = db.filter(i => i.cat === currentLogTab).map(makeItem).join('') || '<p style="text-align:center;color:#444;font-size:0.7rem;">Empty</p>';
+            
+            // Render Calendar Day Log
+            const dayEntries = db.filter(i => i.date === selectedDateStr);
+            document.getElementById('dayLog').innerHTML = `<div style="font-size:0.6rem;opacity:0.4;margin-bottom:15px;text-transform:uppercase;letter-spacing:1px;">Timeline: ${selectedDateStr}</div>` + 
+                (dayEntries.map(makeItem).join('') || '<p style="text-align:center;color:#444;font-size:0.7rem;">Nothing scheduled.</p>');
         }
-        render();
     </script>
 </body>
 </html>
