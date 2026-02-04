@@ -6,120 +6,61 @@
     <title>UNRESTRICTED</title>
     <style>
         :root { 
-            --accent: #b2ffda; 
-            --bg: #0f1113;    
-            --card: rgba(255, 255, 255, 0.04); 
-            --text: #f5f5f5;
-            --glass: blur(16px);
+            --bg: #0f1113; --card: rgba(255, 255, 255, 0.04); --text: #f5f5f5; --glass: blur(16px);
+            --un-green: #00e676; --un-yellow: #ffca28; --un-red: #ff5252;
         }
-        
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 20px 20px 140px 20px;
-            min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
-        }
-        
-        /* The Bold & Strong Header */
-        .header { text-align: center; margin: 50px 0 35px; }
-        h1 { font-size: 1.5rem; letter-spacing: 8px; margin: 0; font-weight: 800; text-transform: uppercase; color: #fff; opacity: 0.9; }
-        .tagline { color: var(--accent); font-size: 0.65rem; margin-top: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; opacity: 0.7; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px 20px 140px 20px; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+        .header { text-align: center; margin: 40px 0 25px; }
+        h1 { font-size: 1.4rem; letter-spacing: 8px; font-weight: 800; text-transform: uppercase; color: #fff; margin: 0; }
+        .tagline { color: var(--un-green); font-size: 0.6rem; letter-spacing: 3px; text-transform: uppercase; margin-top: 10px; opacity: 0.8; font-weight: 600; }
 
-        /* Navigation Views */
-        .view { width: 100%; max-width: 420px; display: none; animation: slideUp 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); margin: 0 auto; }
+        .view { width: 100%; max-width: 420px; display: none; animation: slideUp 0.4s ease; margin: 0 auto; }
         .view.active { display: block; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Premium Inputs */
-        .search-bar { 
-            width: 100%; padding: 22px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08); 
-            background: rgba(255,255,255,0.03); color: white; font-size: 16px; outline: none; box-sizing: border-box;
-            margin-bottom: 25px; backdrop-filter: var(--glass); transition: 0.3s;
-        }
-        .search-bar:focus { border-color: var(--accent); background: rgba(255,255,255,0.06); }
+        .search-bar { width: 100%; padding: 22px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: white; font-size: 16px; outline: none; box-sizing: border-box; margin-bottom: 25px; backdrop-filter: var(--glass); }
+        .search-bar:focus { border-color: var(--un-green); }
 
-        /* The Result Card & Macros */
         .section-card { background: var(--card); border-radius: 35px; padding: 30px; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 20px; backdrop-filter: var(--glass); }
-        .result-display { display: none; text-align: center; border: 1px solid rgba(178, 255, 218, 0.15); box-shadow: 0 10px 40px rgba(0,0,0,0.4); }
         
-        .score-circle { 
-            width: 80px; height: 80px; border: 1px solid var(--accent); border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; font-size: 2rem; 
-            margin: 0 auto 15px; color: var(--accent); font-weight: 200;
-            box-shadow: 0 0 20px rgba(178, 255, 218, 0.1);
-        }
+        /* Result Display */
+        #resBox { display: none; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+        .score-circle { width: 90px; height: 90px; border: 2px solid #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.4rem; margin: 0 auto 15px; font-weight: 200; transition: 0.5s; }
         
-        .macro-row { display: flex; justify-content: space-around; margin: 25px 0; padding: 20px 0; border-top: 1px solid rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .macro-row { display: flex; justify-content: space-around; margin: 25px 0; padding: 15px 0; border-top: 1px solid rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.04); }
         .macro-item { display: flex; flex-direction: column; }
         .macro-val { font-weight: 700; color: #fff; font-size: 1.1rem; }
         .macro-label { font-size: 0.55rem; text-transform: uppercase; color: #666; letter-spacing: 1.5px; margin-top: 6px; }
+        
+        .cal-label { font-size: 0.75rem; font-weight: 800; opacity: 0.5; letter-spacing: 1.5px; margin-bottom: 10px; }
+        .portion-tag { font-size: 0.6rem; color: #555; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; display: block; font-weight: 800; }
+        
+        .fav-btn { background: #333; color: #000; border: none; padding: 18px; border-radius: 18px; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; width: 100%; cursor: pointer; transition: 0.3s; }
 
-        .portion-tag { font-size: 0.65rem; color: #555; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; display: block; font-weight: 700; }
-
-        .fav-btn { 
-            background: var(--accent); color: #000; border: none; padding: 18px; 
-            border-radius: 18px; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; 
-            letter-spacing: 2px; width: 100%; cursor: pointer; transition: 0.3s; margin-top: 10px;
-        }
-        .fav-btn:active { transform: scale(0.97); opacity: 0.9; }
-
-        /* Bottom Command Center */
-        .nav-bar { 
-            position: fixed; bottom: 0; left: 0; right: 0; 
-            background: rgba(15, 17, 19, 0.97); backdrop-filter: blur(25px);
-            display: flex; justify-content: space-around; padding: 15px 10px 40px 10px; 
-            border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000;
-        }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #444; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; flex: 1; transition: 0.3s; }
-        .nav-item.active { color: var(--accent); }
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 17, 19, 0.98); backdrop-filter: blur(25px); display: flex; justify-content: space-around; padding: 15px 10px 40px 10px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #444; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; flex: 1; }
+        .nav-item.active { color: var(--un-green); }
         .nav-icon { font-size: 1.4rem; margin-bottom: 8px; }
-
-        /* List Styling */
         .entry { display: flex; justify-content: space-between; padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
-        .entry:last-child { border-bottom: none; }
-        .item-label { font-size: 0.65rem; color: var(--accent); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 15px; font-weight: 800; opacity: 0.8; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <h1>UNRESTRICTED</h1>
-        <div class="tagline">The Standard of Strategy</div>
+        <div class="tagline">Global Intelligence Active</div>
     </div>
 
     <div id="home" class="view active">
-        <div class="item-label">Strategy: At Home</div>
-        <input type="text" class="search-bar" placeholder="Favorite a recipe..." onkeypress="handleSearch(event, 'home')">
-        <div id="resHome" class="section-card result-display"></div>
-        <div class="item-label">Your Favorites</div>
+        <input type="text" class="search-bar" placeholder="Search any food (e.g. Avocado)..." onkeypress="handleSearch(event, 'home')">
+        <div id="resBox" class="section-card"></div>
+        <div class="item-label" style="font-size: 0.65rem; color: var(--un-green); letter-spacing: 2px; margin-bottom: 15px; text-transform: uppercase; font-weight: 800;">Strategy Favorites</div>
         <div class="section-card" id="homeList"></div>
     </div>
 
-    <div id="go" class="view">
-        <div class="item-label">Strategy: On The Go</div>
-        <input type="text" class="search-bar" placeholder="Favorite a takeout spot..." onkeypress="handleSearch(event, 'go')">
-        <div id="resGo" class="section-card result-display"></div>
-        <div class="item-label">Favorite Spots</div>
-        <div class="section-card" id="goList"></div>
-    </div>
-
-    <div id="calendar" class="view">
-        <div class="item-label">Food Journal</div>
-        <div class="section-card" id="journalList"></div>
-    </div>
-
-    <div id="macro" class="view">
-        <div class="section-card" style="text-align:center; padding:60px 20px;">
-            <div style="font-size:3.5rem; margin-bottom:25px; filter: drop-shadow(0 0 12px var(--accent));">✨</div>
-            <h2 style="color:var(--accent); letter-spacing:6px; font-weight:200; margin:0;">MACRO</h2>
-            <p style="color:#888; font-size:0.95rem; line-height:1.8; margin: 30px 0;">Strategic intelligence active. Database synced with global food standards.</p>
-            <div style="height:1px; width:40px; background:var(--accent); margin: 0 auto; opacity:0.2;"></div>
-            <p style="font-size:0.75rem; color:var(--accent); font-weight:800; letter-spacing:3px; margin-top:30px;">SYSTEM STATUS: OPTIMIZED</p>
-        </div>
-    </div>
+    <div id="go" class="view"><input type="text" class="search-bar" placeholder="Search restaurant foods..." onkeypress="handleSearch(event, 'go')"><div class="section-card" id="goList"></div></div>
+    <div id="calendar" class="view"><div class="section-card" id="journalList"></div></div>
+    <div id="macro" class="view"><div class="section-card" style="text-align:center; padding:50px 20px;"><div style="font-size:3rem; margin-bottom:20px;">✨</div><h2 style="color:var(--un-green); letter-spacing:5px; font-weight:200;">MACRO</h2><p style="color:#888;">Live USDA Data Integration Successful.</p></div></div>
 
     <nav class="nav-bar">
         <div class="nav-item active" onclick="showView('home', this)"><span class="nav-icon">🏠</span><span>At Home</span></div>
@@ -129,14 +70,71 @@
     </nav>
 
     <script>
-        const foodDatabase = {
-            "steak": { s: 10, p: "42g", c: "0g", f: "12g", sz: "6oz cut", d: "Maximum protein density. Shuts down hunger for 6+ hours." },
-            "egg": { s: 10, p: "12g", c: "1g", f: "10g", sz: "2 large eggs", d: "The perfect nutrient profile. High harmony." },
-            "salmon": { s: 10, p: "34g", c: "0g", f: "15g", sz: "6oz fillet", d: "Elite Omega-3s. Essential for cognitive strategy." },
-            "chicken breast": { s: 10, p: "48g", c: "0g", f: "6g", sz: "6oz cooked", d: "Purest protein source for body optimization." },
-            "chipotle": { s: 7, p: "35g", c: "40g", f: "22g", sz: "Standard Bowl", d: "Good balance. Skip the rice for a score of 9." },
-            "sushi": { s: 10, p: "25g", c: "0g", f: "8g", sz: "5pc Sashimi", d: "The ultimate clean choice for on-the-go performance." }
-        };
+        const API_KEY = 'CEUxSOUWTNLeiPciBkeaFUCWx6cwGvS5QiZSDhqo';
+
+        async function handleSearch(e, cat) {
+            if(e.key === 'Enter') {
+                const query = e.target.value.trim();
+                if(!query) return;
+                
+                const resBox = document.getElementById('resBox');
+                resBox.innerHTML = '<p style="color:#666; letter-spacing:2px; font-size:0.7rem;">ANALYZING...</p>';
+                resBox.style.display = 'block';
+
+                try {
+                    const response = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${API_KEY}&query=${query}&pageSize=1`);
+                    const data = await response.json();
+                    
+                    if(data.foods && data.foods.length > 0) {
+                        const food = data.foods[0];
+                        const nutrients = food.foodNutrients;
+                        
+                        const getNutrient = (id) => nutrients.find(n => n.nutrientId === id)?.value || 0;
+                        
+                        const p = getNutrient(1003); // Protein
+                        const f = getNutrient(1004); // Fat
+                        const c = getNutrient(1005); // Carbs
+                        const cal = getNutrient(1008); // Calories
+                        const fib = getNutrient(1079); // Fiber
+                        const sug = getNutrient(2000); // Sugar
+
+                        // UNRESTRICTED SCORING ALGORITHM V1.0
+                        // Formula: Rewards Protein/Fiber, Penalties for Sugar/Density
+                        let score = ( (p * 2) + (fib * 3) ) / ( (cal / 100) + (sug / 2) + 1 );
+                        score = Math.min(10, Math.max(1, score + 5)); // Normalize to 1-10 scale
+                        
+                        const color = score > 7.0 ? 'var(--un-green)' : (score > 5.0 ? 'var(--un-yellow)' : 'var(--un-red)');
+
+                        resBox.innerHTML = `
+                            <span class="portion-tag">Per 100g / Standard</span>
+                            <div class="score-circle" style="color:${color}; border-color:${color}; box-shadow: 0 0 20px ${color}22;">${score.toFixed(1)}</div>
+                            <div class="cal-label">${Math.round(cal)} CALORIES</div>
+                            <h2 style="text-transform:capitalize; margin:0; font-weight:500;">${food.description.toLowerCase()}</h2>
+                            <div class="macro-row">
+                                <div class="macro-item"><span class="macro-val">${Math.round(p)}g</span><span class="macro-label">Prot</span></div>
+                                <div class="macro-item"><span class="macro-val">${Math.round(c)}g</span><span class="macro-label">Carb</span></div>
+                                <div class="macro-item"><span class="macro-val">${Math.round(f)}g</span><span class="macro-label">Fat</span></div>
+                            </div>
+                            <button class="fav-btn" style="background:${color}" onclick="saveFav('${food.description.toLowerCase()}', ${score.toFixed(1)}, '${color}', '${cat}')">+ Add to Favorites</button>
+                        `;
+                    } else {
+                        resBox.innerHTML = '<p style="color:var(--un-red);">No exact match found.</p>';
+                    }
+                } catch (err) {
+                    resBox.innerHTML = '<p style="color:var(--un-red);">Connection Error.</p>';
+                }
+                e.target.value = '';
+                e.target.blur();
+            }
+        }
+
+        function saveFav(name, score, color, cat) {
+            const db = JSON.parse(localStorage.getItem('ur_v5') || '[]');
+            db.push({ id: Date.now(), text: name, score: score, color: color, cat: cat, date: new Date().toLocaleDateString() });
+            localStorage.setItem('ur_v5', JSON.stringify(db));
+            document.getElementById('resBox').style.display = 'none';
+            render();
+        }
 
         function showView(id, el) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -146,55 +144,13 @@
             render();
         }
 
-        function handleSearch(e, cat) {
-            if(e.key === 'Enter') {
-                const query = e.target.value.toLowerCase().trim();
-                const res = foodDatabase[query] || { s: "?", p: "-", c: "-", f: "-", sz: "Pending Data", d: "Intelligence currently analyzing this item." };
-                
-                const displayId = cat === 'home' ? 'resHome' : 'resGo';
-                const displayDiv = document.getElementById(displayId);
-                
-                displayDiv.innerHTML = `
-                    <span class="portion-tag">${res.sz}</span>
-                    <div class="score-circle">${res.s}</div>
-                    <h2 style="text-transform:capitalize; margin:0; font-weight:500;">${query}</h2>
-                    <div class="macro-row">
-                        <div class="macro-item"><span class="macro-val">${res.p}</span><span class="macro-label">Prot</span></div>
-                        <div class="macro-item"><span class="macro-val">${res.c}</span><span class="macro-label">Carb</span></div>
-                        <div class="macro-item"><span class="macro-val">${res.f}</span><span class="macro-label">Fat</span></div>
-                    </div>
-                    <p style="color:#888; font-size:0.85rem; line-height:1.7; margin: 0 0 25px 0;">${res.d}</p>
-                    <button class="fav-btn" onclick="favoriteResult('${query}', '${res.s}', '${cat}')">+ Add to Favorites</button>
-                `;
-                displayDiv.style.display = 'block';
-                e.target.value = '';
-                e.target.blur();
-            }
-        }
-
-        function favoriteResult(name, score, cat) {
-            const db = JSON.parse(localStorage.getItem('ur_v3_9') || '[]');
-            db.push({ id: Date.now(), text: name, score: score, cat: cat, date: new Date().toLocaleDateString() });
-            localStorage.setItem('ur_v3_9', JSON.stringify(db));
-            document.querySelectorAll('.result-display').forEach(d => d.style.display = 'none');
-            render();
-        }
-
         function render() {
-            const db = JSON.parse(localStorage.getItem('ur_v3_9') || '[]');
-            const homeList = document.getElementById('homeList');
-            const goList = document.getElementById('goList');
+            const db = JSON.parse(localStorage.getItem('ur_v5') || '[]');
+            const home = document.getElementById('homeList');
             const cal = document.getElementById('journalList');
-
-            const makeHtml = (items) => items.map(i => `
-                <div class="entry">
-                    <span style="text-transform:capitalize; font-weight:600;">${i.text}</span>
-                    <span style="color:var(--accent); font-weight:800; letter-spacing:1px;">${i.score}</span>
-                </div>`).join('');
-
-            if(homeList) homeList.innerHTML = makeHtml(db.filter(i => i.cat === 'home')) || '<p style="color:#444; font-size:0.8rem; text-align:center;">No favorites yet.</p>';
-            if(goList) goList.innerHTML = makeHtml(db.filter(i => i.cat === 'go')) || '<p style="color:#444; font-size:0.8rem; text-align:center;">No favorite spots yet.</p>';
-            if(cal) cal.innerHTML = makeHtml(db) || '<p style="color:#444; font-size:0.8rem; text-align:center;">Your strategy journal is empty.</p>';
+            const makeHtml = (items) => items.map(i => `<div class="entry"><span style="text-transform:capitalize; font-weight:600;">${i.text}</span><span style="color:${i.color}; font-weight:800;">${i.score}</span></div>`).join('');
+            if(home) home.innerHTML = makeHtml(db.filter(i => i.cat === 'home')) || '<p style="color:#444; font-size:0.7rem; text-align:center;">Empty Strategy</p>';
+            if(cal) cal.innerHTML = makeHtml(db) || '<p style="color:#444; font-size:0.7rem; text-align:center;">Empty Journal</p>';
         }
         render();
     </script>
