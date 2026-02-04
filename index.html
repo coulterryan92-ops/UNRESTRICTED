@@ -5,68 +5,119 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>UNRESTRICTED</title>
     <style>
-        :root { --accent: #b2ffda; --bg: #0f1113; --card: rgba(255, 255, 255, 0.05); --text: #f5f5f5; --glass: blur(15px); }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px 20px 120px 20px; min-height: 100vh; -webkit-font-smoothing: antialiased; }
-        .header { text-align: center; margin: 30px 0; }
-        h1 { font-size: 1.3rem; letter-spacing: 7px; font-weight: 800; text-transform: uppercase; margin: 0; opacity: 0.9; }
+        :root { 
+            --accent: #b2ffda; 
+            --bg: #0f1113;    
+            --card: rgba(255, 255, 255, 0.04); 
+            --text: #f5f5f5;
+            --glass: blur(16px);
+        }
         
-        .view { width: 100%; max-width: 400px; display: none; animation: fadeIn 0.4s ease; margin: 0 auto; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px 20px 140px 20px;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* The Bold & Strong Header */
+        .header { text-align: center; margin: 50px 0 35px; }
+        h1 { font-size: 1.5rem; letter-spacing: 8px; margin: 0; font-weight: 800; text-transform: uppercase; color: #fff; opacity: 0.9; }
+        .tagline { color: var(--accent); font-size: 0.65rem; margin-top: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; opacity: 0.7; }
+
+        /* Navigation Views */
+        .view { width: 100%; max-width: 420px; display: none; animation: slideUp 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); margin: 0 auto; }
         .view.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
-        .section-card { background: var(--card); border-radius: 28px; padding: 25px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 20px; backdrop-filter: var(--glass); }
-        .search-bar { width: 100%; padding: 20px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white; outline: none; box-sizing: border-box; margin-bottom: 20px; font-size: 16px; transition: 0.3s; }
-        .search-bar:focus { border-color: var(--accent); }
+        /* Premium Inputs */
+        .search-bar { 
+            width: 100%; padding: 22px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08); 
+            background: rgba(255,255,255,0.03); color: white; font-size: 16px; outline: none; box-sizing: border-box;
+            margin-bottom: 25px; backdrop-filter: var(--glass); transition: 0.3s;
+        }
+        .search-bar:focus { border-color: var(--accent); background: rgba(255,255,255,0.06); }
 
-        /* Result Popup Card */
-        #resultDisplay { display: none; margin-bottom: 25px; text-align: center; }
-        .score-circle { width: 70px; height: 70px; border: 2px solid var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 15px; color: var(--accent); font-weight: 200; }
-        .fav-btn { background: var(--accent); color: #000; border: none; padding: 12px 25px; border-radius: 12px; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; margin-top: 15px; cursor: pointer; }
+        /* The Result Card & Macros */
+        .section-card { background: var(--card); border-radius: 35px; padding: 30px; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 20px; backdrop-filter: var(--glass); }
+        .result-display { display: none; text-align: center; border: 1px solid rgba(178, 255, 218, 0.15); box-shadow: 0 10px 40px rgba(0,0,0,0.4); }
+        
+        .score-circle { 
+            width: 80px; height: 80px; border: 1px solid var(--accent); border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; font-size: 2rem; 
+            margin: 0 auto 15px; color: var(--accent); font-weight: 200;
+            box-shadow: 0 0 20px rgba(178, 255, 218, 0.1);
+        }
+        
+        .macro-row { display: flex; justify-content: space-around; margin: 25px 0; padding: 20px 0; border-top: 1px solid rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.04); }
+        .macro-item { display: flex; flex-direction: column; }
+        .macro-val { font-weight: 700; color: #fff; font-size: 1.1rem; }
+        .macro-label { font-size: 0.55rem; text-transform: uppercase; color: #666; letter-spacing: 1.5px; margin-top: 6px; }
 
-        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 17, 19, 0.96); backdrop-filter: var(--glass); display: flex; justify-content: space-around; padding: 15px 5px 35px 5px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #555; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; flex: 1; transition: 0.3s; }
+        .portion-tag { font-size: 0.65rem; color: #555; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; display: block; font-weight: 700; }
+
+        .fav-btn { 
+            background: var(--accent); color: #000; border: none; padding: 18px; 
+            border-radius: 18px; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; 
+            letter-spacing: 2px; width: 100%; cursor: pointer; transition: 0.3s; margin-top: 10px;
+        }
+        .fav-btn:active { transform: scale(0.97); opacity: 0.9; }
+
+        /* Bottom Command Center */
+        .nav-bar { 
+            position: fixed; bottom: 0; left: 0; right: 0; 
+            background: rgba(15, 17, 19, 0.97); backdrop-filter: blur(25px);
+            display: flex; justify-content: space-around; padding: 15px 10px 40px 10px; 
+            border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000;
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #444; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; flex: 1; transition: 0.3s; }
         .nav-item.active { color: var(--accent); }
-        .nav-icon { font-size: 1.3rem; margin-bottom: 6px; }
+        .nav-icon { font-size: 1.4rem; margin-bottom: 8px; }
 
-        .entry { display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
-        .item-label { font-size: 0.7rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; font-weight: 800; }
+        /* List Styling */
+        .entry { display: flex; justify-content: space-between; padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .entry:last-child { border-bottom: none; }
+        .item-label { font-size: 0.65rem; color: var(--accent); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 15px; font-weight: 800; opacity: 0.8; }
     </style>
 </head>
 <body>
-    <div class="header"><h1>UNRESTRICTED</h1></div>
+
+    <div class="header">
+        <h1>UNRESTRICTED</h1>
+        <div class="tagline">The Standard of Strategy</div>
+    </div>
 
     <div id="home" class="view active">
-        <div class="item-label">Search At Home Strategy</div>
-        <input type="text" class="search-bar" placeholder="Enter food (e.g. Steak, Eggs)..." onkeypress="handleSearch(event, 'home')">
-        
-        <div id="resultDisplay" class="section-card">
-            <div class="score-circle" id="resScore">0</div>
-            <h2 id="resName" style="text-transform:capitalize; margin:0;">Food</h2>
-            <p id="resDesc" style="color:#888; font-size:0.85rem; line-height:1.5; margin: 15px 0;"></p>
-            <button class="fav-btn" onclick="favoriteResult()">+ Add to Strategy</button>
-        </div>
-
+        <div class="item-label">Strategy: At Home</div>
+        <input type="text" class="search-bar" placeholder="Favorite a recipe..." onkeypress="handleSearch(event, 'home')">
+        <div id="resHome" class="section-card result-display"></div>
         <div class="item-label">Your Favorites</div>
         <div class="section-card" id="homeList"></div>
     </div>
 
     <div id="go" class="view">
-        <div class="item-label">Search On The Go Strategy</div>
-        <input type="text" class="search-bar" placeholder="Enter food (e.g. Chipotle, Pizza)..." onkeypress="handleSearch(event, 'go')">
-        <div class="item-list" id="goList"></div>
+        <div class="item-label">Strategy: On The Go</div>
+        <input type="text" class="search-bar" placeholder="Favorite a takeout spot..." onkeypress="handleSearch(event, 'go')">
+        <div id="resGo" class="section-card result-display"></div>
+        <div class="item-label">Favorite Spots</div>
+        <div class="section-card" id="goList"></div>
     </div>
 
     <div id="calendar" class="view">
-        <div class="item-label">Daily Journal</div>
+        <div class="item-label">Food Journal</div>
         <div class="section-card" id="journalList"></div>
     </div>
 
     <div id="macro" class="view">
-        <div class="section-card" style="text-align:center; padding:50px 20px;">
-            <div style="font-size:3rem; margin-bottom:20px; filter: drop-shadow(0 0 10px var(--accent));">✨</div>
-            <h2 style="color:var(--accent); letter-spacing:5px; font-weight:200; margin:0;">MACRO</h2>
-            <p style="color:#888; font-size:0.9rem; line-height:1.7; margin: 25px 0;">Activating full global database sync...</p>
-            <p style="font-size:0.75rem; color:var(--accent); font-weight:800; letter-spacing:2px; margin-top:25px;">ONLINE AT 9:00 PM</p>
+        <div class="section-card" style="text-align:center; padding:60px 20px;">
+            <div style="font-size:3.5rem; margin-bottom:25px; filter: drop-shadow(0 0 12px var(--accent));">✨</div>
+            <h2 style="color:var(--accent); letter-spacing:6px; font-weight:200; margin:0;">MACRO</h2>
+            <p style="color:#888; font-size:0.95rem; line-height:1.8; margin: 30px 0;">Strategic intelligence active. Database synced with global food standards.</p>
+            <div style="height:1px; width:40px; background:var(--accent); margin: 0 auto; opacity:0.2;"></div>
+            <p style="font-size:0.75rem; color:var(--accent); font-weight:800; letter-spacing:3px; margin-top:30px;">SYSTEM STATUS: OPTIMIZED</p>
         </div>
     </div>
 
@@ -79,65 +130,71 @@
 
     <script>
         const foodDatabase = {
-            "steak": { s: 10, d: "Maximum protein density and satiety. Shuts down hunger for 6+ hours." },
-            "egg": { s: 10, d: "The perfect nutrient profile. High harmony for any meal." },
-            "banana": { s: 8, d: "Great natural energy. High fiber helps mitigate the sugar spike." },
-            "pizza": { s: 3, d: "Low satiety, high reward. A delight, but requires a strong strategy." },
-            "chipotle": { s: 7, d: "Excellent protein options. Skip the rice to boost your score to a 9." },
-            "salmon": { s: 10, d: "Elite omega-3s and protein. Pure fuel for a lean body." },
-            "avocado": { s: 9, d: "Healthy fats that keep you full. High harmony with protein." }
+            "steak": { s: 10, p: "42g", c: "0g", f: "12g", sz: "6oz cut", d: "Maximum protein density. Shuts down hunger for 6+ hours." },
+            "egg": { s: 10, p: "12g", c: "1g", f: "10g", sz: "2 large eggs", d: "The perfect nutrient profile. High harmony." },
+            "salmon": { s: 10, p: "34g", c: "0g", f: "15g", sz: "6oz fillet", d: "Elite Omega-3s. Essential for cognitive strategy." },
+            "chicken breast": { s: 10, p: "48g", c: "0g", f: "6g", sz: "6oz cooked", d: "Purest protein source for body optimization." },
+            "chipotle": { s: 7, p: "35g", c: "40g", f: "22g", sz: "Standard Bowl", d: "Good balance. Skip the rice for a score of 9." },
+            "sushi": { s: 10, p: "25g", c: "0g", f: "8g", sz: "5pc Sashimi", d: "The ultimate clean choice for on-the-go performance." }
         };
-
-        let lastResult = null;
-        let activeCat = 'home';
 
         function showView(id, el) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             el.classList.add('active');
-            activeCat = id;
             render();
         }
 
         function handleSearch(e, cat) {
             if(e.key === 'Enter') {
                 const query = e.target.value.toLowerCase().trim();
-                const result = foodDatabase[query] || { s: "?", d: "MACRO is currently analyzing this. Check back at 9:00 PM for the full score." };
+                const res = foodDatabase[query] || { s: "?", p: "-", c: "-", f: "-", sz: "Pending Data", d: "Intelligence currently analyzing this item." };
                 
-                document.getElementById('resName').innerText = query;
-                document.getElementById('resScore').innerText = result.s;
-                document.getElementById('resDesc').innerText = result.d;
-                document.getElementById('resultDisplay').style.display = 'block';
+                const displayId = cat === 'home' ? 'resHome' : 'resGo';
+                const displayDiv = document.getElementById(displayId);
                 
-                lastResult = { text: query, score: result.s, cat: cat };
+                displayDiv.innerHTML = `
+                    <span class="portion-tag">${res.sz}</span>
+                    <div class="score-circle">${res.s}</div>
+                    <h2 style="text-transform:capitalize; margin:0; font-weight:500;">${query}</h2>
+                    <div class="macro-row">
+                        <div class="macro-item"><span class="macro-val">${res.p}</span><span class="macro-label">Prot</span></div>
+                        <div class="macro-item"><span class="macro-val">${res.c}</span><span class="macro-label">Carb</span></div>
+                        <div class="macro-item"><span class="macro-val">${res.f}</span><span class="macro-label">Fat</span></div>
+                    </div>
+                    <p style="color:#888; font-size:0.85rem; line-height:1.7; margin: 0 0 25px 0;">${res.d}</p>
+                    <button class="fav-btn" onclick="favoriteResult('${query}', '${res.s}', '${cat}')">+ Add to Favorites</button>
+                `;
+                displayDiv.style.display = 'block';
                 e.target.value = '';
                 e.target.blur();
             }
         }
 
-        function favoriteResult() {
-            if(!lastResult) return;
-            const db = JSON.parse(localStorage.getItem('ur_v3_5') || '[]');
-            db.push({ ...lastResult, id: Date.now(), date: new Date().toLocaleDateString() });
-            localStorage.setItem('ur_v3_5', JSON.stringify(db));
-            document.getElementById('resultDisplay').style.display = 'none';
+        function favoriteResult(name, score, cat) {
+            const db = JSON.parse(localStorage.getItem('ur_v3_9') || '[]');
+            db.push({ id: Date.now(), text: name, score: score, cat: cat, date: new Date().toLocaleDateString() });
+            localStorage.setItem('ur_v3_9', JSON.stringify(db));
+            document.querySelectorAll('.result-display').forEach(d => d.style.display = 'none');
             render();
         }
 
         function render() {
-            const db = JSON.parse(localStorage.getItem('ur_v3_5') || '[]');
+            const db = JSON.parse(localStorage.getItem('ur_v3_9') || '[]');
             const homeList = document.getElementById('homeList');
+            const goList = document.getElementById('goList');
             const cal = document.getElementById('journalList');
 
             const makeHtml = (items) => items.map(i => `
                 <div class="entry">
-                    <span><strong style="text-transform:capitalize;">${i.text}</strong></span>
-                    <span style="color:var(--accent); font-weight:800;">${i.score}</span>
+                    <span style="text-transform:capitalize; font-weight:600;">${i.text}</span>
+                    <span style="color:var(--accent); font-weight:800; letter-spacing:1px;">${i.score}</span>
                 </div>`).join('');
 
-            homeList.innerHTML = makeHtml(db.filter(i => i.cat === 'home')) || '<p style="color:#444; font-size:0.8rem; text-align:center;">No favorite recipes yet.</p>';
-            cal.innerHTML = makeHtml(db) || '<p style="color:#444; font-size:0.8rem; text-align:center;">Journal is empty.</p>';
+            if(homeList) homeList.innerHTML = makeHtml(db.filter(i => i.cat === 'home')) || '<p style="color:#444; font-size:0.8rem; text-align:center;">No favorites yet.</p>';
+            if(goList) goList.innerHTML = makeHtml(db.filter(i => i.cat === 'go')) || '<p style="color:#444; font-size:0.8rem; text-align:center;">No favorite spots yet.</p>';
+            if(cal) cal.innerHTML = makeHtml(db) || '<p style="color:#444; font-size:0.8rem; text-align:center;">Your strategy journal is empty.</p>';
         }
         render();
     </script>
