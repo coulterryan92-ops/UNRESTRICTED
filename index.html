@@ -9,115 +9,50 @@
             --bg: #0f1113; --card: rgba(255, 255, 255, 0.04); --text: #f5f5f5; --glass: blur(16px);
             --un-green: #00e676; --un-yellow: #ffca28; --un-red: #ff5252;
         }
-        
-        body { 
-            font-family: -apple-system, system-ui, sans-serif; 
-            background: var(--bg); color: var(--text); 
-            margin: 0; padding: 20px 20px 140px 20px; 
-            min-height: 100vh; -webkit-font-smoothing: antialiased; 
-        }
-        
-        /* Brand Header */
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px 20px 140px 20px; min-height: 100vh; -webkit-font-smoothing: antialiased; }
         .header { text-align: center; margin: 40px 0 25px; }
         h1 { font-size: 1.4rem; letter-spacing: 8px; font-weight: 800; text-transform: uppercase; color: #fff; margin: 0; }
         .tagline { color: var(--un-green); font-size: 0.6rem; letter-spacing: 3px; text-transform: uppercase; margin-top: 10px; opacity: 0.8; font-weight: 600; }
-
-        /* View Management */
         .view { width: 100%; max-width: 420px; display: none; animation: slideUp 0.4s ease; margin: 0 auto; }
         .view.active { display: block; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Search Interface */
-        .search-bar { 
-            width: 100%; padding: 22px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08); 
-            background: rgba(255,255,255,0.03); color: white; font-size: 16px; outline: none; box-sizing: border-box; 
-            margin-bottom: 25px; backdrop-filter: var(--glass); transition: 0.3s; 
-        }
-        .search-bar:focus { border-color: var(--un-green); background: rgba(255,255,255,0.06); }
-
+        .search-bar { width: 100%; padding: 22px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: white; font-size: 16px; outline: none; box-sizing: border-box; margin-bottom: 25px; backdrop-filter: var(--glass); }
         .section-card { background: var(--card); border-radius: 35px; padding: 30px; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 20px; backdrop-filter: var(--glass); }
-        
-        /* Scoring Result Card */
         #resBox { display: none; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
         .score-circle { width: 90px; height: 90px; border: 2px solid #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.4rem; margin: 0 auto 15px; font-weight: 200; }
-        .cal-label { font-size: 0.75rem; font-weight: 800; opacity: 0.5; letter-spacing: 1.5px; margin-bottom: 10px; }
-
-        /* Macros */
         .macro-row { display: flex; justify-content: space-around; margin: 25px 0; padding: 15px 0; border-top: 1px solid rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.04); }
         .macro-item { display: flex; flex-direction: column; }
         .macro-val { font-weight: 700; color: #fff; font-size: 1.1rem; }
         .macro-label { font-size: 0.55rem; text-transform: uppercase; color: #666; letter-spacing: 1.5px; margin-top: 6px; }
-
-        /* Save Buttons */
-        .action-btns { display: flex; gap: 10px; margin-top: 20px; }
-        .save-btn { flex: 1; background: #333; color: #000; border: none; padding: 18px; border-radius: 18px; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.2s; }
-        .save-btn:active { transform: scale(0.95); }
-
-        /* Log Toggles */
         .log-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .log-tab { 
-            flex: 1; padding: 14px; border-radius: 16px; background: rgba(255,255,255,0.03); 
-            text-align: center; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; 
-            letter-spacing: 1px; color: #555; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); 
-            transition: 0.3s; 
-        }
-        .log-tab.active { background: var(--card); color: var(--un-green); border-color: var(--un-green); box-shadow: 0 4px 15px rgba(0,230,118,0.1); }
-
-        /* Navigation Bar */
-        .nav-bar { 
-            position: fixed; bottom: 0; left: 0; right: 0; 
-            background: rgba(15, 17, 19, 0.98); backdrop-filter: blur(25px); 
-            display: flex; justify-content: space-around; padding: 15px 10px 40px 10px; 
-            border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; 
-        }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #444; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; flex: 1; transition: 0.3s; }
+        .log-tab { flex: 1; padding: 14px; border-radius: 16px; background: rgba(255,255,255,0.03); text-align: center; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #555; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); }
+        .log-tab.active { background: var(--card); color: var(--un-green); border-color: var(--un-green); }
+        .save-btn { flex: 1; background: #333; color: #000; border: none; padding: 18px; border-radius: 18px; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 17, 19, 0.98); backdrop-filter: blur(25px); display: flex; justify-content: space-around; padding: 15px 10px 40px 10px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #444; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; flex: 1; }
         .nav-item.active { color: var(--un-green); }
         .nav-icon { font-size: 1.4rem; margin-bottom: 8px; }
-        
-        /* List Entries */
         .entry { display: flex; justify-content: space-between; padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
-        .entry:last-child { border-bottom: none; }
     </style>
 </head>
 <body>
-
-    <div class="header">
-        <h1>UNRESTRICTED</h1>
-        <div class="tagline">Sophisticated Performance</div>
-    </div>
+    <div class="header"><h1>UNRESTRICTED</h1><div class="tagline">System Status: Active</div></div>
 
     <div id="find" class="view active">
-        <input type="text" class="search-bar" placeholder="Find food to analyze..." onkeypress="handleSearch(event)">
-        
-        <div id="resBox" class="section-card">
-            </div>
-
-        <div class="section-card" style="text-align: center; padding: 40px 20px;">
-            <p style="color: #444; font-size: 0.8rem; letter-spacing: 1.5px; line-height: 1.6; text-transform: uppercase; font-weight: 700;">Global USDA Search Active</p>
-        </div>
+        <form onsubmit="event.preventDefault(); handleSearch();">
+            <input type="search" id="searchInput" class="search-bar" placeholder="Find food to analyze...">
+        </form>
+        <div id="resBox" class="section-card"></div>
+        <div class="section-card" style="text-align: center; padding: 40px 20px;"><p style="color: #444; font-size: 0.8rem; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700;">USDA Global Search Active</p></div>
     </div>
 
     <div id="log" class="view">
-        <div class="log-tabs">
-            <div id="tabAtHome" class="log-tab active" onclick="setLogTab('home')">At Home</div>
-            <div id="tabOnGo" class="log-tab" onclick="setLogTab('go')">On The Go</div>
-        </div>
-        <div class="section-card" id="logContent">
-            </div>
+        <div class="log-tabs"><div id="tabAtHome" class="log-tab active" onclick="setLogTab('home')">At Home</div><div id="tabOnGo" class="log-tab" onclick="setLogTab('go')">On The Go</div></div>
+        <div class="section-card" id="logContent"></div>
     </div>
 
-    <div id="calendar" class="view">
-        <div style="font-size: 0.65rem; color: var(--un-green); letter-spacing: 3px; margin-bottom: 15px; text-transform: uppercase; font-weight: 800; text-align: center;">Strategy Timeline</div>
-        <div class="section-card" id="journalList"></div>
-    </div>
-
-    <div id="macro" class="view">
-        <div class="section-card" style="text-align:center; padding:60px 20px;">
-            <div style="font-size:3rem; margin-bottom:20px;">✨</div>
-            <h2 style="color:var(--un-green); letter-spacing:5px; font-weight:200;">MACRO</h2>
-            <p style="color:#888; font-size: 0.9rem; line-height: 1.6;">Intelligence Layer Active.<br>Awaiting Strategic Commands.</p>
-        </div>
-    </div>
+    <div id="calendar" class="view"><div class="section-card" id="journalList"></div></div>
+    <div id="macro" class="view"><div class="section-card" style="text-align:center; padding:60px 20px;"><div style="font-size:3rem; margin-bottom:20px;">✨</div><h2 style="color:var(--un-green); letter-spacing:5px; font-weight:200;">MACRO</h2><p style="color:#888;">Intelligence Ready.</p></div></div>
 
     <nav class="nav-bar">
         <div class="nav-item active" onclick="showView('find', this)"><span class="nav-icon">🔍</span><span>Find Food</span></div>
@@ -130,56 +65,64 @@
         const API_KEY = 'CEUxSOUWTNLeiPciBkeaFUCWx6cwGvS5QiZSDhqo';
         let currentLogTab = 'home';
 
-        async function handleSearch(e) {
-            if(e.key === 'Enter') {
-                const query = e.target.value.trim();
-                if(!query) return;
+        async function handleSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            if(!query) return;
+            
+            const resBox = document.getElementById('resBox');
+            resBox.innerHTML = '<p style="color:var(--un-yellow); font-size:0.7rem; letter-spacing:2px;">REQUESTING DATA...</p>';
+            resBox.style.display = 'block';
+
+            try {
+                const url = `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${API_KEY}&query=${encodeURIComponent(query)}&pageSize=1`;
+                const response = await fetch(url);
                 
-                const resBox = document.getElementById('resBox');
-                resBox.innerHTML = '<p style="color:#666; font-size:0.7rem; letter-spacing:2px;">SEARCHING DATABASE...</p>';
-                resBox.style.display = 'block';
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.error?.message || `HTTP ${response.status}`);
+                }
 
-                try {
-                    const response = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${API_KEY}&query=${query}&pageSize=1`);
-                    const data = await response.json();
+                const data = await response.json();
+                
+                if(data.foods && data.foods.length > 0) {
+                    const food = data.foods[0];
+                    const nutrients = food.foodNutrients;
+                    const getNut = (id) => nutrients.find(n => n.nutrientId === id)?.value || 0;
                     
-                    if(data.foods && data.foods.length > 0) {
-                        const food = data.foods[0];
-                        const nutrients = food.foodNutrients;
-                        const getNut = (id) => nutrients.find(n => n.nutrientId === id)?.value || 0;
-                        
-                        const p = getNut(1003), f = getNut(1004), c = getNut(1005), cal = getNut(1008), fib = getNut(1079), sug = getNut(2000);
+                    const p = getNut(1003), f = getNut(1004), c = getNut(1005), cal = getNut(1008), fib = getNut(1079), sug = getNut(2000);
 
-                        // Unified Scoring Logic
-                        let score = ( (p * 2) + (fib * 3) ) / ( (cal / 100) + (sug / 2) + 1 );
-                        score = Math.min(10, Math.max(1, score + 5));
-                        const color = score > 7.0 ? 'var(--un-green)' : (score > 5.0 ? 'var(--un-yellow)' : 'var(--un-red)');
+                    let score = ( (p * 2) + (fib * 3) ) / ( (cal / 100) + (sug / 2) + 1 );
+                    score = Math.min(10, Math.max(1, score + 5));
+                    const color = score > 7.0 ? 'var(--un-green)' : (score > 5.0 ? 'var(--un-yellow)' : 'var(--un-red)');
 
-                        resBox.innerHTML = `
-                            <div class="score-circle" style="color:${color}; border-color:${color};">${score.toFixed(1)}</div>
-                            <div class="cal-label">${Math.round(cal)} CALORIES</div>
-                            <h2 style="text-transform:capitalize; margin:0; font-weight:500; letter-spacing:1px;">${food.description.toLowerCase()}</h2>
-                            <div class="macro-row">
-                                <div class="macro-item"><span class="macro-val">${Math.round(p)}g</span><span class="macro-label">Prot</span></div>
-                                <div class="macro-item"><span class="macro-val">${Math.round(c)}g</span><span class="macro-label">Carb</span></div>
-                                <div class="macro-item"><span class="macro-val">${Math.round(f)}g</span><span class="macro-label">Fat</span></div>
-                            </div>
-                            <div class="action-btns">
-                                <button class="save-btn" style="background:${color}" onclick="saveEntry('${food.description.toLowerCase()}', ${score.toFixed(1)}, '${color}', 'home')">At Home</button>
-                                <button class="save-btn" style="background:${color}" onclick="saveEntry('${food.description.toLowerCase()}', ${score.toFixed(1)}, '${color}', 'go')">On Go</button>
-                            </div>
-                        `;
-                    }
-                } catch (err) { resBox.innerHTML = 'Error reaching USDA.'; }
-                e.target.value = '';
+                    resBox.innerHTML = `
+                        <div class="score-circle" style="color:${color}; border-color:${color};">${score.toFixed(1)}</div>
+                        <div style="font-size:0.75rem; font-weight:800; opacity:0.5; margin-bottom:10px;">${Math.round(cal)} CALORIES</div>
+                        <h2 style="text-transform:capitalize; margin:0; font-weight:500;">${food.description.toLowerCase()}</h2>
+                        <div class="macro-row">
+                            <div class="macro-item"><span class="macro-val">${Math.round(p)}g</span><span class="macro-label">Prot</span></div>
+                            <div class="macro-item"><span class="macro-val">${Math.round(c)}g</span><span class="macro-label">Carb</span></div>
+                            <div class="macro-item"><span class="macro-val">${Math.round(f)}g</span><span class="macro-label">Fat</span></div>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button class="save-btn" style="background:${color}" onclick="saveEntry('${food.description.toLowerCase()}', ${score.toFixed(1)}, '${color}', 'home')">At Home</button>
+                            <button class="save-btn" style="background:${color}" onclick="saveEntry('${food.description.toLowerCase()}', ${score.toFixed(1)}, '${color}', 'go')">On Go</button>
+                        </div>
+                    `;
+                } else {
+                    resBox.innerHTML = '<p style="color:var(--un-red);">No match found. Try a simpler term (e.g. "Beef").</p>';
+                }
+            } catch (err) { 
+                resBox.innerHTML = `<p style="color:var(--un-red); font-size:0.7rem;">ERROR: ${err.message}</p><p style="color:#666; font-size:0.6rem; margin-top:10px;">If this says "API_KEY_INVALID," the key needs more time to activate.</p>`;
             }
         }
 
         function saveEntry(name, score, color, cat) {
-            const db = JSON.parse(localStorage.getItem('ur_v5_2') || '[]');
+            const db = JSON.parse(localStorage.getItem('ur_v5_3') || '[]');
             db.push({ id: Date.now(), text: name, score: score, color: color, cat: cat, date: new Date().toLocaleDateString() });
-            localStorage.setItem('ur_v5_2', JSON.stringify(db));
+            localStorage.setItem('ur_v5_3', JSON.stringify(db));
             document.getElementById('resBox').style.display = 'none';
+            document.getElementById('searchInput').value = '';
             render();
         }
 
@@ -199,12 +142,10 @@
         }
 
         function render() {
-            const db = JSON.parse(localStorage.getItem('ur_v5_2') || '[]');
+            const db = JSON.parse(localStorage.getItem('ur_v5_3') || '[]');
             const logContent = document.getElementById('logContent');
             const calList = document.getElementById('journalList');
-
             const makeEntry = (i) => `<div class="entry"><span style="text-transform:capitalize; font-weight:600;">${i.text}</span><span style="color:${i.color}; font-weight:800;">${i.score}</span></div>`;
-
             logContent.innerHTML = db.filter(i => i.cat === currentLogTab).map(makeEntry).join('') || '<p style="text-align:center; color:#444; font-size:0.7rem;">Nothing logged yet.</p>';
             calList.innerHTML = db.map(makeEntry).join('') || '<p style="text-align:center; color:#444; font-size:0.7rem;">Timeline is clear.</p>';
         }
