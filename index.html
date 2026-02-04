@@ -40,10 +40,10 @@
 
     <div id="find" class="view active">
         <form onsubmit="event.preventDefault(); handleSearch();">
-            <input type="search" id="searchInput" class="search-bar" placeholder="Find food to analyze...">
+            <input type="search" id="searchInput" class="search-bar" placeholder="Find food (e.g. Steak, Apple)...">
         </form>
         <div id="resBox" class="section-card"></div>
-        <div class="section-card" style="text-align: center; padding: 40px 20px;"><p style="color: #444; font-size: 0.8rem; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700;">USDA Global Search Active</p></div>
+        <div class="section-card" style="text-align: center; padding: 40px 20px;"><p style="color: #444; font-size: 0.8rem; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700;">Global USDA Search Active</p></div>
     </div>
 
     <div id="log" class="view">
@@ -62,65 +62,81 @@
     </nav>
 
     <script>
-        const API_KEY = 'CEUxSOUWTNLeiPciBkeaFUCWx6cwGvS5QiZSDhqo';
+        // CLEAN KEY (No hidden spaces)
+        const API_KEY = 'CEUxSOUWTNLeiPciBkeaFUCWx6cwGvS5QiZSDhqo'.trim();
         let currentLogTab = 'home';
 
+        // MOCK DATA for immediate testing while key activates
+        const mockData = {
+            "apple": { p: 0.3, f: 0.2, c: 14, cal: 52, fib: 2.4, sug: 10, desc: "fresh apple" },
+            "steak": { p: 25, f: 19, c: 0, cal: 271, fib: 0, sug: 0, desc: "ribeye steak" },
+            "pizza": { p: 11, f: 10, c: 33, cal: 266, fib: 2, sug: 4, desc: "cheese pizza" }
+        };
+
         async function handleSearch() {
-            const query = document.getElementById('searchInput').value.trim();
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
             if(!query) return;
-            
             const resBox = document.getElementById('resBox');
-            resBox.innerHTML = '<p style="color:var(--un-yellow); font-size:0.7rem; letter-spacing:2px;">REQUESTING DATA...</p>';
+            resBox.innerHTML = '<p style="color:var(--un-yellow); font-size:0.7rem; letter-spacing:2px;">SEARCHING...</p>';
             resBox.style.display = 'block';
 
             try {
                 const url = `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${API_KEY}&query=${encodeURIComponent(query)}&pageSize=1`;
                 const response = await fetch(url);
-                
-                if (!response.ok) {
-                    const errData = await response.json();
-                    throw new Error(errData.error?.message || `HTTP ${response.status}`);
-                }
-
                 const data = await response.json();
-                
-                if(data.foods && data.foods.length > 0) {
-                    const food = data.foods[0];
-                    const nutrients = food.foodNutrients;
-                    const getNut = (id) => nutrients.find(n => n.nutrientId === id)?.value || 0;
-                    
-                    const p = getNut(1003), f = getNut(1004), c = getNut(1005), cal = getNut(1008), fib = getNut(1079), sug = getNut(2000);
 
-                    let score = ( (p * 2) + (fib * 3) ) / ( (cal / 100) + (sug / 2) + 1 );
-                    score = Math.min(10, Math.max(1, score + 5));
-                    const color = score > 7.0 ? 'var(--un-green)' : (score > 5.0 ? 'var(--un-yellow)' : 'var(--un-red)');
-
-                    resBox.innerHTML = `
-                        <div class="score-circle" style="color:${color}; border-color:${color};">${score.toFixed(1)}</div>
-                        <div style="font-size:0.75rem; font-weight:800; opacity:0.5; margin-bottom:10px;">${Math.round(cal)} CALORIES</div>
-                        <h2 style="text-transform:capitalize; margin:0; font-weight:500;">${food.description.toLowerCase()}</h2>
-                        <div class="macro-row">
-                            <div class="macro-item"><span class="macro-val">${Math.round(p)}g</span><span class="macro-label">Prot</span></div>
-                            <div class="macro-item"><span class="macro-val">${Math.round(c)}g</span><span class="macro-label">Carb</span></div>
-                            <div class="macro-item"><span class="macro-val">${Math.round(f)}g</span><span class="macro-label">Fat</span></div>
-                        </div>
-                        <div style="display:flex; gap:10px;">
-                            <button class="save-btn" style="background:${color}" onclick="saveEntry('${food.description.toLowerCase()}', ${score.toFixed(1)}, '${color}', 'home')">At Home</button>
-                            <button class="save-btn" style="background:${color}" onclick="saveEntry('${food.description.toLowerCase()}', ${score.toFixed(1)}, '${color}', 'go')">On Go</button>
-                        </div>
-                    `;
+                if (response.ok && data.foods && data.foods.length > 0) {
+                    displayFood(data.foods[0], false);
+                } else if (mockData[query]) {
+                    displayFood(mockData[query], true);
                 } else {
-                    resBox.innerHTML = '<p style="color:var(--un-red);">No match found. Try a simpler term (e.g. "Beef").</p>';
+                    throw new Error("No results found.");
                 }
-            } catch (err) { 
-                resBox.innerHTML = `<p style="color:var(--un-red); font-size:0.7rem;">ERROR: ${err.message}</p><p style="color:#666; font-size:0.6rem; margin-top:10px;">If this says "API_KEY_INVALID," the key needs more time to activate.</p>`;
+            } catch (err) {
+                if (mockData[query]) {
+                    displayFood(mockData[query], true);
+                } else {
+                    resBox.innerHTML = `<p style="color:var(--un-red); font-size:0.7rem;">USDA KEY SLEEPING.</p><p style="color:#666; font-size:0.6rem; margin-top:5px;">Key activation can take 1-2 hours. Try searching "Apple" for a demo.</p>`;
+                }
             }
         }
 
+        function displayFood(food, isMock) {
+            let p, f, c, cal, fib, sug, name;
+            
+            if (isMock) {
+                ({p, f, c, cal, fib, sug} = food);
+                name = food.desc;
+            } else {
+                const getNut = (id) => food.foodNutrients.find(n => n.nutrientId === id)?.value || 0;
+                p = getNut(1003); f = getNut(1004); c = getNut(1005); cal = getNut(1008); fib = getNut(1079); sug = getNut(2000);
+                name = food.description.toLowerCase();
+            }
+
+            let score = ( (p * 2) + (fib * 3) ) / ( (cal / 100) + (sug / 2) + 1 );
+            score = Math.min(10, Math.max(1, score + 5));
+            const color = score > 7.0 ? 'var(--un-green)' : (score > 5.0 ? 'var(--un-yellow)' : 'var(--un-red)');
+
+            document.getElementById('resBox').innerHTML = `
+                <div class="score-circle" style="color:${color}; border-color:${color};">${score.toFixed(1)}</div>
+                <div style="font-size:0.75rem; font-weight:800; opacity:0.5; margin-bottom:10px;">${Math.round(cal)} CALORIES ${isMock ? '(DEMO)' : ''}</div>
+                <h2 style="text-transform:capitalize; margin:0; font-weight:500;">${name}</h2>
+                <div class="macro-row">
+                    <div class="macro-item"><span class="macro-val">${Math.round(p)}g</span><span class="macro-label">Prot</span></div>
+                    <div class="macro-item"><span class="macro-val">${Math.round(c)}g</span><span class="macro-label">Carb</span></div>
+                    <div class="macro-item"><span class="macro-val">${Math.round(f)}g</span><span class="macro-label">Fat</span></div>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button class="save-btn" style="background:${color}" onclick="saveEntry('${name}', ${score.toFixed(1)}, '${color}', 'home')">At Home</button>
+                    <button class="save-btn" style="background:${color}" onclick="saveEntry('${name}', ${score.toFixed(1)}, '${color}', 'go')">On Go</button>
+                </div>
+            `;
+        }
+
         function saveEntry(name, score, color, cat) {
-            const db = JSON.parse(localStorage.getItem('ur_v5_3') || '[]');
+            const db = JSON.parse(localStorage.getItem('ur_v5_4') || '[]');
             db.push({ id: Date.now(), text: name, score: score, color: color, cat: cat, date: new Date().toLocaleDateString() });
-            localStorage.setItem('ur_v5_3', JSON.stringify(db));
+            localStorage.setItem('ur_v5_4', JSON.stringify(db));
             document.getElementById('resBox').style.display = 'none';
             document.getElementById('searchInput').value = '';
             render();
@@ -142,7 +158,7 @@
         }
 
         function render() {
-            const db = JSON.parse(localStorage.getItem('ur_v5_3') || '[]');
+            const db = JSON.parse(localStorage.getItem('ur_v5_4') || '[]');
             const logContent = document.getElementById('logContent');
             const calList = document.getElementById('journalList');
             const makeEntry = (i) => `<div class="entry"><span style="text-transform:capitalize; font-weight:600;">${i.text}</span><span style="color:${i.color}; font-weight:800;">${i.score}</span></div>`;
