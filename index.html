@@ -14,15 +14,9 @@
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 10px; }
         .cal-title { font-size: 1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
         .cal-btn { background: none; border: 1px solid rgba(255,255,255,0.1); color: var(--text); padding: 8px 12px; border-radius: 10px; cursor: pointer; }
-        
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 20px; }
         .day-label { text-align: center; font-size: 0.6rem; color: #666; font-weight: 700; text-transform: uppercase; margin-bottom: 10px; }
-        
-        .day-cell { 
-            aspect-ratio: 1; background: rgba(255,255,255,0.02); border-radius: 12px; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            font-size: 0.8rem; position: relative; cursor: pointer; border: 1px solid transparent;
-        }
+        .day-cell { aspect-ratio: 1; background: rgba(255,255,255,0.02); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.8rem; position: relative; cursor: pointer; border: 1px solid transparent; }
         .day-cell.today { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); }
         .day-cell.selected { background: var(--un-green); color: #000; font-weight: 800; box-shadow: 0 0 15px rgba(0,230,118,0.3); }
         .day-cell.has-data::after { content: ''; width: 4px; height: 4px; background: var(--un-green); border-radius: 50%; position: absolute; bottom: 6px; }
@@ -43,17 +37,24 @@
         .macro-val { font-weight: 700; color: #fff; font-size: 1.1rem; }
         .macro-label { font-size: 0.55rem; text-transform: uppercase; color: #666; letter-spacing: 1.5px; margin-top: 6px; }
         
+        /* Buttons & Lists */
         .log-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
         .log-tab { flex: 1; padding: 14px; border-radius: 16px; background: rgba(255,255,255,0.03); text-align: center; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #555; cursor: pointer; }
         .log-tab.active { background: var(--card); color: var(--un-green); }
-        .save-btn { flex: 1; background: #333; color: #000; border: none; padding: 18px; border-radius: 18px; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
+        
+        .action-btns { display: flex; gap: 10px; margin-top: 20px; }
+        .save-btn { flex: 2; background: #333; color: #000; border: none; padding: 18px; border-radius: 18px; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
+        .fav-btn { flex: 1; background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.1); padding: 18px; border-radius: 18px; font-weight: 800; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        
         .entry { display: flex; justify-content: space-between; align-items: center; padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
-        .delete-btn { color: #333; font-size: 1rem; padding: 5px 10px; cursor: pointer; }
+        .entry-actions { display: flex; gap: 15px; align-items: center; }
+        .delete-btn { color: #333; font-size: 1rem; padding: 5px; cursor: pointer; }
+        .quick-log-btn { color: var(--un-green); font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; background: rgba(0,230,118,0.1); padding: 8px 12px; border-radius: 8px; }
 
-        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 17, 19, 0.98); backdrop-filter: blur(25px); display: flex; justify-content: space-around; padding: 15px 10px 40px 10px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #444; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; flex: 1; }
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 17, 19, 0.98); backdrop-filter: blur(25px); display: flex; justify-content: space-around; padding: 15px 5px 40px 5px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #444; font-size: 0.55rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; flex: 1; }
         .nav-item.active { color: var(--un-green); }
-        .nav-icon { font-size: 1.4rem; margin-bottom: 8px; }
+        .nav-icon { font-size: 1.3rem; margin-bottom: 6px; }
     </style>
 </head>
 <body>
@@ -87,6 +88,11 @@
         <div class="section-card" id="dayLog"></div>
     </div>
 
+    <div id="favorites" class="view">
+        <div style="font-size: 0.65rem; color: var(--un-green); letter-spacing: 3px; margin-bottom: 15px; text-transform: uppercase; font-weight: 800; text-align: center;">Saved Vault</div>
+        <div class="section-card" id="favContent"></div>
+    </div>
+
     <div id="macro" class="view">
         <div class="section-card" style="text-align:center; padding:60px 20px;">
             <div style="font-size:3rem; margin-bottom:20px;">✨</div>
@@ -99,6 +105,7 @@
         <div class="nav-item active" onclick="showView('search', this)"><span class="nav-icon">🔍</span><span>Search</span></div>
         <div class="nav-item" onclick="showView('log', this)"><span class="nav-icon">📋</span><span>Log</span></div>
         <div class="nav-item" onclick="showView('calendar', this)"><span class="nav-icon">📅</span><span>Timeline</span></div>
+        <div class="nav-item" onclick="showView('favorites', this)"><span class="nav-icon">♥</span><span>Favs</span></div>
         <div class="nav-item" onclick="showView('macro', this)"><span class="nav-icon">✨</span><span>Macro</span></div>
     </nav>
 
@@ -119,7 +126,6 @@
         ];
 
         let currentLogTab = 'home';
-        // Calendar State
         let today = new Date();
         let currentMonth = today.getMonth();
         let currentYear = today.getFullYear();
@@ -135,33 +141,20 @@
             const grid = document.getElementById('calGrid');
             const title = document.getElementById('calMonthTitle');
             grid.innerHTML = '';
-
-            // Set Title
             const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             title.innerText = `${monthNames[currentMonth]} ${currentYear}`;
-
-            // Day Labels
             const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
             days.forEach(d => grid.innerHTML += `<div class="day-label">${d}</div>`);
-
-            // Calculate Grid
             const firstDay = new Date(currentYear, currentMonth, 1).getDay();
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-            const db = JSON.parse(localStorage.getItem('ur_v7_1') || '[]');
-
-            // Empty Cells
-            for (let i = 0; i < firstDay; i++) {
-                grid.innerHTML += `<div class="day-cell empty"></div>`;
-            }
-
-            // Day Cells
+            const db = JSON.parse(localStorage.getItem('ur_v8_1') || '[]');
+            for (let i = 0; i < firstDay; i++) { grid.innerHTML += `<div class="day-cell empty"></div>`; }
             for (let d = 1; d <= daysInMonth; d++) {
                 const dateObj = new Date(currentYear, currentMonth, d);
                 const dStr = dateObj.toLocaleDateString();
                 const isToday = dStr === new Date().toLocaleDateString();
                 const isSelected = dStr === selectedDateStr;
                 const hasData = db.some(entry => entry.date === dStr);
-
                 const cell = document.createElement('div');
                 cell.className = `day-cell ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${hasData ? 'has-data' : ''}`;
                 cell.innerText = d;
@@ -190,6 +183,7 @@
                 let score = ( (p * 2) + (fib * 3) ) / ( (cal / 100) + (sug / 2) + 1 );
                 score = Math.min(10, Math.max(1, score + 5));
                 const color = score > 7.0 ? 'var(--un-green)' : (score > 5.0 ? 'var(--un-yellow)' : 'var(--un-red)');
+                const favData = JSON.stringify({n: match.n, s: score.toFixed(1), c: color}).replace(/"/g, "&quot;");
 
                 resBox.innerHTML = `
                     <div class="score-circle" style="color:${color}; border-color:${color};">${score.toFixed(1)}</div>
@@ -200,30 +194,53 @@
                         <div class="macro-item"><span class="macro-val">${c}g</span><span class="macro-label">Carb</span></div>
                         <div class="macro-item"><span class="macro-val">${f}g</span><span class="macro-label">Fat</span></div>
                     </div>
-                    <div style="display:flex; gap:10px;">
+                    <div class="action-btns">
                         <button class="save-btn" style="background:${color}" onclick="saveEntry('${match.n}', ${score.toFixed(1)}, '${color}', 'home')">Log to ${selectedDateStr}</button>
+                        <button class="fav-btn" onclick="toggleFavorite(${favData})">♥</button>
                     </div>`;
             } else {
-                resBox.innerHTML = '<p style="color:var(--un-red);">Not in Core DB. Try "Steak".</p>';
+                resBox.innerHTML = '<p style="color:var(--un-red);">Not in Core DB.</p>';
             }
         }
 
         function saveEntry(name, score, color, cat) {
-            const db = JSON.parse(localStorage.getItem('ur_v7_1') || '[]');
+            const db = JSON.parse(localStorage.getItem('ur_v8_1') || '[]');
             db.push({ id: Date.now(), text: name, score: score, color: color, cat: cat, date: selectedDateStr });
-            localStorage.setItem('ur_v7_1', JSON.stringify(db));
+            localStorage.setItem('ur_v8_1', JSON.stringify(db));
             document.getElementById('resBox').style.display = 'none';
             document.getElementById('searchInput').value = '';
-            renderCalendar(); // Update dots
+            renderCalendar();
             render();
             showView('calendar', document.querySelectorAll('.nav-item')[2]);
         }
 
         function deleteEntry(id) {
-            let db = JSON.parse(localStorage.getItem('ur_v7_1') || '[]');
+            let db = JSON.parse(localStorage.getItem('ur_v8_1') || '[]');
             db = db.filter(i => i.id !== id);
-            localStorage.setItem('ur_v7_1', JSON.stringify(db));
+            localStorage.setItem('ur_v8_1', JSON.stringify(db));
             renderCalendar();
+            render();
+        }
+
+        // --- FAVORITES LOGIC ---
+        function toggleFavorite(data) {
+            let favs = JSON.parse(localStorage.getItem('ur_favs') || '[]');
+            const exists = favs.find(f => f.n === data.n);
+            if(exists) {
+                favs = favs.filter(f => f.n !== data.n);
+                alert("Removed from Favorites");
+            } else {
+                favs.push(data);
+                alert("Added to Favorites");
+            }
+            localStorage.setItem('ur_favs', JSON.stringify(favs));
+            render();
+        }
+
+        function removeFav(name) {
+            let favs = JSON.parse(localStorage.getItem('ur_favs') || '[]');
+            favs = favs.filter(f => f.n !== name);
+            localStorage.setItem('ur_favs', JSON.stringify(favs));
             render();
         }
 
@@ -238,16 +255,31 @@
         function setLogTab(tab) { currentLogTab = tab; render(); document.getElementById('tabAtHome').classList.toggle('active', tab === 'home'); document.getElementById('tabOnGo').classList.toggle('active', tab === 'go'); }
 
         function render() {
-            const db = JSON.parse(localStorage.getItem('ur_v7_1') || '[]');
-            
-            // Render General Log (Tabbed)
+            const db = JSON.parse(localStorage.getItem('ur_v8_1') || '[]');
+            const favs = JSON.parse(localStorage.getItem('ur_favs') || '[]');
+
+            // Log
             const makeItem = (i) => `<div class="entry"><div style="display:flex;align-items:center;gap:15px;"><span style="text-transform:capitalize;font-weight:600;">${i.text}</span><span style="color:${i.color};font-weight:800;">${i.score}</span></div><div class="delete-btn" onclick="deleteEntry(${i.id})">✕</div></div>`;
             document.getElementById('logContent').innerHTML = db.filter(i => i.cat === currentLogTab).map(makeItem).join('') || '<p style="text-align:center;color:#444;font-size:0.7rem;">Empty</p>';
             
-            // Render Calendar Day Log
+            // Calendar Day Log
             const dayEntries = db.filter(i => i.date === selectedDateStr);
             document.getElementById('dayLog').innerHTML = `<div style="font-size:0.6rem;opacity:0.4;margin-bottom:15px;text-transform:uppercase;letter-spacing:1px;">Timeline: ${selectedDateStr}</div>` + 
                 (dayEntries.map(makeItem).join('') || '<p style="text-align:center;color:#444;font-size:0.7rem;">Nothing scheduled.</p>');
+
+            // Favorites List
+            const makeFav = (f) => `
+                <div class="entry">
+                    <div style="display:flex;align-items:center;gap:15px;">
+                        <span style="text-transform:capitalize;font-weight:600;">${f.n}</span>
+                        <span style="color:${f.c};font-weight:800;">${f.s}</span>
+                    </div>
+                    <div class="entry-actions">
+                        <div class="quick-log-btn" onclick="saveEntry('${f.n}', ${f.s}, '${f.c}', 'home')">Log</div>
+                        <div class="delete-btn" onclick="removeFav('${f.n}')">✕</div>
+                    </div>
+                </div>`;
+            document.getElementById('favContent').innerHTML = favs.map(makeFav).join('') || '<p style="text-align:center;color:#444;font-size:0.7rem;">No favorites saved yet.</p>';
         }
     </script>
 </body>
